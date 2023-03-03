@@ -7,13 +7,11 @@ import { ContentRating,
     Request,
     Response,
     TrackerActionQueue, 
-    MangaProviding,
     Searchable,
     MangaProgressProviding,
     SourceManga,
     MangaProgress,
-    SourceIntents,
-    Requestable} from '@paperback/types'
+    SourceIntents} from '@paperback/types'
 import { deleteMangaProgressMutation,
     getMangaProgressQuery,
     getMangaQuery,
@@ -34,7 +32,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.0.10',
+    version: '1.0.11',
     description: 'Anilist Tracker',
     authorWebsite: 'faizandurrani.github.io',
     websiteBaseURL: 'https://anilist.co',
@@ -108,7 +106,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
     
     async getSearchResults(query: SearchRequest, metadata: unknown): Promise<PagedResults> {
         const pageInfo = metadata as AnilistPage.PageInfo | undefined
-        // If there are no more results, we dont want to make extra calls to Anilist
+        // If there are no more results, we don't want to make extra calls to Anilist
         if (pageInfo?.hasNextPage === false) {
             return App.createPagedResults({ results: [], metadata: pageInfo })
         }
@@ -449,10 +447,20 @@ export class Anilist implements Searchable, MangaProgressProviding {
         
         for (const readAction of chapterReadActions) {
             try {
-                const params = {
-                    mediaId: readAction.mangaId,
-                    progress: Math.floor(readAction.chapterNumber),
-                    progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : undefined
+                let params = {}
+                if (Math.floor(readAction.chapterNumber) == 1 && !readAction.volumeNumber) {
+                    params = {
+                        mediaId: readAction.mangaId,
+                        progress: 1,
+                        progressVolumes: 1
+                    }
+                }
+                else {
+                    params = {
+                        mediaId: readAction.mangaId,
+                        progress: Math.floor(readAction.chapterNumber),
+                        progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : undefined
+                    }
                 }
                 const response = await this.requestManager.schedule(App.createRequest({
                     url: ANILIST_GRAPHQL_ENDPOINT,
