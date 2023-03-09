@@ -1,8 +1,5 @@
 lib/
 
-# VSCode settings
-.vscode
-
 # Logs
 logs
 *.log
