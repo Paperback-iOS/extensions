@@ -1,3 +1,7 @@
 Anilist:
-5ttonr95ia@privacy-mail.top
-PBThrowaway2
+    email: 5ttonr95ia@privacy-mail.top
+    PW: PBThrowaway2
+
+Baka-Updates:
+    email: ppbta@proton.me
+    PW: PBThrowaway2
