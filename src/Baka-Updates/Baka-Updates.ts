@@ -1,6 +1,7 @@
-import { Tracker,
-    ContentRating } from '@paperback/types'
-import type { SourceInfo,
+import {
+    Tracker,
+    ContentRating,
+    SourceInfo,
     TrackedManga,
     SourceManga,
     Form,
@@ -9,8 +10,10 @@ import type { SourceInfo,
     SearchRequest,
     PagedResults,
     TrackerActionQueue,
-    TrackedMangaChapterReadAction } from '@paperback/types'
-import { Credentials,
+    TrackedMangaChapterReadAction
+} from '@paperback/types'
+import {
+    Credentials,
     validateCredentials,
     getUserCredentials,
     setUserCredentials,
@@ -20,15 +23,20 @@ import { Credentials,
     clearSessionToken,
     getLoginTime,
     loggableRequest,
-    loggableResponse, } from './utils/bu-session'
-import { parseMangaInfo,
-    getIdFromPage, } from './utils/bu-manga'
+    loggableResponse
+} from './utils/bu-session'
+import {
+    parseMangaInfo,
+    getIdFromPage
+} from './utils/bu-manga'
 import { parseSearchResults } from './utils/bu-search'
-import type { Endpoint,
+import type {
+    Endpoint,
     Verb,
     Request,
     Response,
-    BaseRequest } from './models'
+    BaseRequest
+} from './models'
 import type { MUListsSeriesModelUpdateV1 } from './models/bu-api'
 interface MangaFormValues {
     mangaId: string;
@@ -52,12 +60,12 @@ interface ParsedAction {
 const FALLBACK_PROFILE_IMAGE = 'https://cdn.mangaupdates.com/avatar/a0.gif'
 const DEFAULT_LIST_ID = 0 // Reading List
 export const MangaUpdatesInfo: SourceInfo = {
-    name: 'MangaUpdates',
+    name: 'Baka-Updates',
     author: 'IntermittentlyRupert',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '2.0.1',
-    description: 'MangaUpdates Tracker',
+    version: '2.0.2',
+    description: 'Baka-Updates Tracker',
     websiteBaseURL: 'https://www.mangaupdates.com'
 }
 export class MangaUpdates extends Tracker {
@@ -74,7 +82,17 @@ export class MangaUpdates extends Tracker {
             const mangaInfo = await this.getMangaInfo(mangaId)
             const trackedManga = App.createSourceManga({
                 id: mangaId,
-                mangaInfo: App.createMangaInfo(mangaInfo)
+                mangaInfo: App.createMangaInfo({
+                    image: '',
+                    titles: '',
+                    artist: '',
+                    author: '',
+                    desc: '',
+                    hentai: '',
+                    rating: '',
+                    status: '',
+                    banner: ''
+                })
             })
             console.log(`${logPrefix} complete`)
             return trackedManga
