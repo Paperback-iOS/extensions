@@ -1,4 +1,5 @@
-import { ContentRating,
+import {
+    ContentRating,
     DUIForm,
     PagedResults,
     SearchRequest,
@@ -11,20 +12,25 @@ import { ContentRating,
     MangaProgressProviding,
     SourceManga,
     MangaProgress,
-    SourceIntents} from '@paperback/types'
-import { deleteMangaProgressMutation,
+    SourceIntents
+} from '@paperback/types'
+import {
+    deleteMangaProgressMutation,
     getMangaProgressQuery,
     getMangaQuery,
     GraphQLQuery,
     saveMangaProgressMutation,
     searchMangaQuery,
-    userProfileQuery } from './models/graphql-queries'
+    userProfileQuery
+} from './models/graphql-queries'
 import * as AnilistUser from './models/anilist-user'
 import * as AnilistPage from './models/anilist-page'
 import * as AnilistManga from './models/anilist-manga'
 import { AnilistResult } from './models/anilist-result'
-import { getdefaultStatus,
-    trackerSettings } from './AlSettings'
+import {
+    getdefaultStatus,
+    trackerSettings
+} from './AlSettings'
 const ANILIST_GRAPHQL_ENDPOINT = 'https://graphql.anilist.co/'
 const FALLBACK_IMAGE = 'https://via.placeholder.com/100x150'
 export const AnilistInfo: SourceInfo = {
@@ -32,7 +38,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.0.11',
+    version: '1.0.12',
     description: 'Anilist Tracker',
     authorWebsite: 'faizandurrani.github.io',
     websiteBaseURL: 'https://anilist.co',

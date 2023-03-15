@@ -1,5 +1,7 @@
-import { DUINavigationButton,
-    SourceStateManager } from '@paperback/types'
+import {
+    DUINavigationButton,
+    SourceStateManager
+} from '@paperback/types'
 export const getdefaultStatus = async (stateManager: SourceStateManager): Promise<string[]> => {
     return (await stateManager.retrieve('defaultStatus') as string[]) ?? ['NONE']
 }

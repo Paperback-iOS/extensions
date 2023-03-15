@@ -1,4 +1,3 @@
-
 export interface GraphQLQuery {
     query: string
     variables?: unknown
