@@ -1,6 +1,6 @@
 # Extensions
 
-Trackers extensions for [Paperback](https://paperback.moe/) 0.8.
+Tracker extensions for [Paperback](https://paperback.moe/) 0.8.
 
 Tracking helps you automatically send read manga chapters to supported trackers, so you can keep track of what and when you read it online.
 
