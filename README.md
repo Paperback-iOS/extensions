@@ -9,7 +9,7 @@ Paperback does not officially support source extensions (extensions with content
 ## Supported trackers
 
 - [AniList](https://anilist.co/)
-- [Baka-Updates](https://www.mangaupdates.com/)
+- [MangaUpdates](https://www.mangaupdates.com/)
 
 ## To be supported trackers
 
