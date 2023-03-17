@@ -14,6 +14,7 @@ import {
     MangaProgress,
     SourceIntents
 } from '@paperback/types'
+
 import {
     deleteMangaProgressMutation,
     getMangaProgressQuery,
@@ -27,26 +28,31 @@ import * as AnilistUser from './models/anilist-user'
 import * as AnilistPage from './models/anilist-page'
 import * as AnilistManga from './models/anilist-manga'
 import { AnilistResult } from './models/anilist-result'
+
 import {
     getdefaultStatus,
     trackerSettings
 } from './AlSettings'
+
 const ANILIST_GRAPHQL_ENDPOINT = 'https://graphql.anilist.co/'
 const FALLBACK_IMAGE = 'https://via.placeholder.com/100x150'
+
 export const AnilistInfo: SourceInfo = {
     name: 'Anilist',
     author: 'Faizan Durrani',
+    authorWebsite: 'faizandurrani.github.io',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
     version: '1.0.12',
     description: 'Anilist Tracker',
-    authorWebsite: 'faizandurrani.github.io',
     websiteBaseURL: 'https://anilist.co',
     intents: SourceIntents.MANGA_TRACKING |
      SourceIntents.SETTINGS_UI
 }
 
 export class Anilist implements Searchable, MangaProgressProviding {
+    stateManager = App.createSourceStateManager();   
+    
     requestManager = App.createRequestManager({
         requestsPerSecond: 2.5,
         requestTimeout: 20_000,
@@ -71,8 +77,6 @@ export class Anilist implements Searchable, MangaProgressProviding {
             }
         }
     });
-    
-    stateManager = App.createSourceStateManager();
 
     accessToken = {
         get: async (): Promise<string | undefined> => {
@@ -88,6 +92,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
             return (await this.accessToken.get()) != null
         }
     };
+    
     userInfo = {
         get: async (): Promise<AnilistUser.Viewer | undefined> => {
             return this.stateManager.retrieve('userInfo') as Promise<AnilistUser.Viewer | undefined>
@@ -388,8 +393,8 @@ export class Anilist implements Searchable, MangaProgressProviding {
                     anilistManga.title?.english,
                     anilistManga.title?.native
                 ].filter(x => x != null) as string[],
-                artist: anilistManga.staff?.edges?.find(x => x?.role?.toLowerCase() == 'art')?.node?.name?.full ?? 'Unknown',
                 author: anilistManga.staff?.edges?.find(x => x?.role?.toLowerCase() == 'story')?.node?.name?.full ?? 'Unknown',
+                artist: anilistManga.staff?.edges?.find(x => x?.role?.toLowerCase() == 'art')?.node?.name?.full ?? 'Unknown',
                 desc: anilistManga?.description || '',
                 hentai: anilistManga.isAdult,
                 rating: anilistManga.averageScore,

@@ -2,15 +2,17 @@ import {
     DUINavigationButton,
     SourceStateManager
 } from '@paperback/types'
+
 export const getdefaultStatus = async (stateManager: SourceStateManager): Promise<string[]> => {
     return (await stateManager.retrieve('defaultStatus') as string[]) ?? ['NONE']
 }
+
 export const trackerSettings = (stateManager: SourceStateManager): DUINavigationButton => {
     return App.createDUINavigationButton({
         id: 'tracker_settings',
         label: 'Tracker Settings',
         form: App.createDUIForm({
-            onSubmit: async (values: any) => {
+            onSubmit: async (values) => {
                 await Promise.all([
                     stateManager.store('defaultStatus', values.defaultStatus)
                 ])
