@@ -1,4 +1,4 @@
-import type { MUSeriesSearchResponseV1 } from '../models/bu-api'
+import type { MUSeriesSearchResponseV1 } from '../models/mu-api'
 
 type ApiResult = Exclude<MUSeriesSearchResponseV1['results'], undefined>[0]
 

@@ -1,17 +1,17 @@
 import {
-    Tracker,
+    SourceIntents,
     ContentRating,
     SourceInfo,
-    TrackedManga,
     SourceManga,
-    Form,
-    FormRow,
-    Section,
     SearchRequest,
     PagedResults,
     TrackerActionQueue,
-    TrackedMangaChapterReadAction
+    TrackedMangaChapterReadAction,
+    Searchable,
+    MangaProgressProviding,
+    MangaInfo
 } from '@paperback/types'
+
 import {
     Credentials,
     validateCredentials,
@@ -24,20 +24,26 @@ import {
     getLoginTime,
     loggableRequest,
     loggableResponse
-} from './utils/bu-session'
+} from './utils/mu-session'
 import {
     parseMangaInfo,
     getIdFromPage
-} from './utils/bu-manga'
-import { parseSearchResults } from './utils/bu-search'
+} from './utils/mu-manga'
+import {
+    parseSearchResults
+} from './utils/mu-search'
+
 import type {
     Endpoint,
     Verb,
     Request,
     Response,
     BaseRequest
-} from './models'
-import type { MUListsSeriesModelUpdateV1 } from './models/bu-api'
+} from './models/index'
+import type {
+    MUListsSeriesModelUpdateV1
+} from './models/mu-api'
+
 interface MangaFormValues {
     mangaId: string;
     mangaTitle: string;
@@ -57,24 +63,34 @@ interface ParsedAction {
     isUpdate: boolean;
     payload: MUListsSeriesModelUpdateV1;
 }
+
 const FALLBACK_PROFILE_IMAGE = 'https://cdn.mangaupdates.com/avatar/a0.gif'
 const DEFAULT_LIST_ID = 0 // Reading List
+
 export const MangaUpdatesInfo: SourceInfo = {
-    name: 'Baka-Updates',
+    name: 'MangaUpdates',
     author: 'IntermittentlyRupert',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
     version: '2.0.2',
-    description: 'Baka-Updates Tracker',
-    websiteBaseURL: 'https://www.mangaupdates.com'
+    description: 'MangaUpdates Tracker',
+    websiteBaseURL: 'https://www.mangaupdates.com',
+    intents: SourceIntents.MANGA_TRACKING |
+     SourceIntents.SETTINGS_UI
 }
-export class MangaUpdates extends Tracker {
+
+export class MangaUpdates implements Searchable, MangaProgressProviding {
     stateManager = App.createSourceStateManager();
-    requestManager = App.createRequestManager({ requestsPerSecond: 5, requestTimeout: 10000 });
+
+    requestManager = App.createRequestManager({
+        requestsPerSecond: 5,
+        requestTimeout: 10000
+    });
+
     ////////////////////
     // Public API
     ////////////////////
-    async getTrackedManga(mangaId: string): Promise<TrackedManga> {
+    async getTrackedManga(mangaId: string): Promise<SourceManga> {
         const logPrefix = '[getTrackedManga]'
         console.log(`${logPrefix} starts`)
         try {
@@ -82,17 +98,7 @@ export class MangaUpdates extends Tracker {
             const mangaInfo = await this.getMangaInfo(mangaId)
             const trackedManga = App.createSourceManga({
                 id: mangaId,
-                mangaInfo: App.createMangaInfo({
-                    image: '',
-                    titles: '',
-                    artist: '',
-                    author: '',
-                    desc: '',
-                    hentai: '',
-                    rating: '',
-                    status: '',
-                    banner: ''
-                })
+                mangaInfo: App.createMangaInfo(mangaInfo)
             })
             console.log(`${logPrefix} complete`)
             return trackedManga
@@ -103,8 +109,9 @@ export class MangaUpdates extends Tracker {
             throw e
         }
     }
+
     getMangaForm(mangaId: string): Form {
-        return App.createDUIForm({
+        return App.createForm({
             sections: async () => {
                 try {
                     const username = (await getUserCredentials(this.stateManager))?.username
@@ -281,6 +288,7 @@ export class MangaUpdates extends Tracker {
             validate: () => Promise.resolve(true)
         })
     }
+
     async getSourceMenu(): Promise<Section> {
         return App.createSection({
             id: 'sourceMenu',
@@ -321,7 +329,7 @@ export class MangaUpdates extends Tracker {
                         id: 'loginButton',
                         label: 'Login',
                         value: undefined,
-                        form: App.createDUIForm({
+                        form: App.createForm({
                             sections: () => Promise.resolve([
                                 App.createSection({
                                     id: 'username_section',
@@ -358,6 +366,7 @@ export class MangaUpdates extends Tracker {
             }
         })
     }
+
     async getSearchResults(query: SearchRequest, metadata?: {
         nextPage?: number;
     }): Promise<PagedResults> {
@@ -402,6 +411,7 @@ export class MangaUpdates extends Tracker {
             throw e
         }
     }
+
     async processActionQueue(actionQueue: TrackerActionQueue): Promise<void> {
         const logPrefix = '[processActionQueue]'
         console.log(`${logPrefix} starts`)
@@ -443,6 +453,7 @@ export class MangaUpdates extends Tracker {
         }
         console.log(`${logPrefix} complete`)
     }
+
     ////////////////////
     // Session Management
     ////////////////////
@@ -474,6 +485,7 @@ export class MangaUpdates extends Tracker {
             throw new Error('Login failed!')
         }
     }
+
     private async refreshSession(): Promise<void> {
         const logPrefix = '[refreshSession]'
         console.log(`${logPrefix} starts`)
@@ -486,6 +498,7 @@ export class MangaUpdates extends Tracker {
         await this.login(credentials)
         console.log(`${logPrefix} complete`)
     }
+
     private async logout(): Promise<void> {
         try {
             await this.request('/v1/account/logout', 'POST', {})
@@ -499,6 +512,7 @@ export class MangaUpdates extends Tracker {
             clearSessionToken(this.stateManager),
         ])
     }
+
     ////////////////////
     // Request Handlers
     ////////////////////
@@ -522,7 +536,8 @@ export class MangaUpdates extends Tracker {
         console.log(`${logPrefix} mapped to canonical ID: ${mangaId} --> ${canonicalId}`)
         return canonicalId
     }
-    private async getMangaInfo(canonicalId: string): Promise<SourceManga> {
+
+    private async getMangaInfo(canonicalId: string): Promise<MangaInfo> {
         const logPrefix = '[getMangaInfo]'
         console.log(`${logPrefix} start: ${canonicalId}`)
         const series = await this.request('/v1/series/{id}', 'GET', {
@@ -533,6 +548,7 @@ export class MangaUpdates extends Tracker {
         console.log(`${logPrefix} complete: ${JSON.stringify(mangaInfo)}`)
         return mangaInfo
     }
+
     private async handleMangaFormChanges(values: MangaFormValues): Promise<void> {
         const logPrefix = '[handleMangaFormChanges]'
         console.log(`${logPrefix} starts: ${JSON.stringify(values)}`)
@@ -580,6 +596,7 @@ export class MangaUpdates extends Tracker {
             throw e
         }
     }
+
     private async parseAction(action: TrackedMangaChapterReadAction): Promise<ParsedAction> {
         const canonicalId = await this.getCanonicalId(action.mangaId)
         const listInfo = await this.request('/v1/lists/series/{seriesId}', 'GET', {
@@ -599,6 +616,7 @@ export class MangaUpdates extends Tracker {
             }
         }
     }
+
     ////////////////////
     // API Request
     ////////////////////
@@ -619,10 +637,13 @@ export class MangaUpdates extends Tracker {
         }
         throw new Error('You must be logged in!')
     }
+
     /** Will **resolve to undefined** if the response has a non-2xx status. */
     private async request<E extends Endpoint, V extends Verb<E>>(endpoint: E, verb: V, request: Request<E, V>, failOnErrorStatus: false, retryCount?: number): Promise<Response<E, V> | undefined>;
+    
     /** Will **reject** if the response has a non-2xx status. */
     private async request<E extends Endpoint, V extends Verb<E>>(endpoint: E, verb: V, request: Request<E, V>, failOnErrorStatus?: boolean, retryCount?: number): Promise<Response<E, V>>;
+    
     /** Will **reject** if the response has a non-2xx status. */
     private async request<E extends Endpoint, V extends Verb<E>>(endpoint: E, verb: V, request: Request<E, V>, failOnErrorStatus = true, retryCount = 1): Promise<Response<E, V>> {
         const logPrefix = `[request] ${verb} ${endpoint}`

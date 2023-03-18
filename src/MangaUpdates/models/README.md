@@ -1,4 +1,4 @@
-# MangaUpdates OpenAPI Types
+# MangaUpdates OpenAPI types
 
 This folder contains auto-generated types for the [MangaUpdates API](https://api.mangaupdates.com/), as well as
 some helper types.
@@ -7,7 +7,7 @@ some helper types.
 >
 > Do not modify the auto-generated files manually!
 
-## To re-generate the API types...
+## To re-generate the API types
 
 Run the following commands from the root of the repository:
 

@@ -1,4 +1,4 @@
-import * as API from './bu-api'
+import * as API from './mu-api'
 
 type HttpVerb = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
