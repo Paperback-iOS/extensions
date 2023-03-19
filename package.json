@@ -1,7 +1,7 @@
 {
   "name": "extensions",
   "version": "1.0.12",
-  "description": "Default trackers for Paperback 0.8.",
+  "description": "Default tracker extensions for Paperback 0.8.",
   "scripts": {
     "migrate": "npx paperback migrate",
     "bundle": "npx paperback bundle",
