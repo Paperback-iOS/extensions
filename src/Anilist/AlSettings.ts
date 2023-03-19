@@ -12,11 +12,6 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
         id: 'tracker_settings',
         label: 'Tracker Settings',
         form: App.createDUIForm({
-            onSubmit: async (values) => {
-                await Promise.all([
-                    stateManager.store('defaultStatus', values.defaultStatus)
-                ])
-            },
             sections: () => {
                 return Promise.resolve([
                     App.createDUISection({
@@ -28,7 +23,8 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
                                 label: 'Default Status',
                                 allowsMultiselect: false,
                                 value: App.createDUIBinding({
-                                    get: () => getdefaultStatus(stateManager)
+                                    get: () => getdefaultStatus(stateManager),
+                                    set: async (newValue) => await stateManager.store('defaultStatus', newValue)
                                 }),
                                 labelResolver: async (value) => {
                                     switch (value) {
