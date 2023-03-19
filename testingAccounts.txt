@@ -1,7 +1,3 @@
 Anilist:
     email: 5ttonr95ia@privacy-mail.top
     PW: PBThrowaway2
-
-MangaUpdates:
-    email: ppbta@proton.me
-    PW: PBThrowaway2
