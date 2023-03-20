@@ -3,17 +3,17 @@ export interface Result {
 }
 
 export interface Media {
-    id?:             number;
-    description?:    string;
-    title?:          Title;
-    coverImage?:     CoverImage;
-    bannerImage?:    string;
-    averageScore?:   number;
-    isAdult?:        boolean;
-    popularity?:     number;
-    characters?:     Characters;
-    staff?:          Staff;
-    status?:         string;
+    id?: number;
+    description?: string;
+    title?: Title;
+    coverImage?: CoverImage;
+    bannerImage?: string;
+    averageScore?: number;
+    isAdult?: boolean;
+    popularity?: number;
+    characters?: Characters;
+    staff?: Staff;
+    status?: string;
     mediaListEntry?: MediaListEntry;
 }
 
@@ -29,7 +29,7 @@ export interface CharactersEdge {
 
 export interface CharacterNode {
     image?: Image;
-    age?:   null | string;
+    age?: null | string;
 }
 
 export interface Image {
@@ -39,7 +39,7 @@ export interface Image {
 export enum Role {
     Background = 'BACKGROUND',
     Main = 'MAIN',
-    Supporting = 'SUPPORTING',
+    Supporting = 'SUPPORTING'
 }
 
 export interface CoverImage {
@@ -47,22 +47,22 @@ export interface CoverImage {
 }
 
 export interface MediaListEntry {
-    id?:              number;
-    status?:          string;
-    progress?:        number;
+    id?: number;
+    status?: string;
+    progress?: number;
     progressVolumes?: number;
-    private?:         boolean;
-    score?:           number;
-    notes?:           null;
-    advancedScores?:  AdvancedScores;
+    private?: boolean;
+    score?: number;
+    notes?: null;
+    advancedScores?: AdvancedScores;
 }
 
 export interface AdvancedScores {
-    Story?:      number;
+    Story?: number;
     Characters?: number;
-    Visuals?:    number;
-    Audio?:      number;
-    Enjoyment?:  number;
+    Visuals?: number;
+    Audio?: number;
+    Enjoyment?: number;
 }
 
 export interface Staff {
@@ -75,7 +75,7 @@ export interface StaffEdge {
 }
 
 export interface StaffNode {
-    name?:  Name;
+    name?: Name;
     image?: Image;
 }
 
@@ -84,8 +84,8 @@ export interface Name {
 }
 
 export interface Title {
-    romaji?:  string;
+    romaji?: string;
     english?: string;
-    native?:  string;
+    native?: string;
     userPreferred?: string;
 }

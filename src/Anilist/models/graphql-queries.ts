@@ -1,4 +1,3 @@
-
 export interface GraphQLQuery {
     query: string
     variables?: unknown
@@ -9,6 +8,9 @@ export const userProfileQuery = (): GraphQLQuery => ({
         Viewer {
             id
             name
+            avatar {
+                large
+            }
             mediaListOptions {
                 scoreFormat
             }
@@ -18,7 +20,7 @@ export const userProfileQuery = (): GraphQLQuery => ({
 })
 
 export const searchMangaQuery = (page: number, search: string): GraphQLQuery => ({
-    query:  `query($page: Int, $search: String) {
+    query: `query($page: Int, $search: String) {
         Page(page: $page) {
             pageInfo {
                 currentPage
@@ -121,17 +123,19 @@ export const getMangaProgressQuery = (id: number): GraphQLQuery => ({
             status
         }
     }`,
-    variables: { id }
+    variables: {
+        id
+    }
 })
 
 export interface SaveMangaProgressVariables {
-    id?: number
-    mediaId?: number | string
-    status?: string
-    score?: number
-    progress?: number
-    progressVolumes?: number
-    notes?: string
+    id?: number;
+    mediaId?: number | string;
+    status?: string;
+    score?: number;
+    progress?: number;
+    progressVolumes?: number;
+    notes?: string;
 }
 
 export const saveMangaProgressMutation = (variables: SaveMangaProgressVariables): GraphQLQuery => ({
@@ -149,5 +153,7 @@ export const deleteMangaProgressMutation = (id: number): GraphQLQuery => ({
             deleted
         }
     }`,
-    variables: { id }
+    variables: {
+        id
+    }
 })

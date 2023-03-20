@@ -4,12 +4,12 @@ export interface Result {
 
 export interface Page {
     pageInfo: PageInfo;
-    media:    Media[];
+    media: Media[];
 }
 
 export interface Media {
-    id:         number;
-    title:      Title;
+    id: number;
+    title: Title;
     coverImage: CoverImage;
 }
 
@@ -22,9 +22,9 @@ export interface Title {
 }
 
 export interface PageInfo {
-    total:       number;
+    total: number;
     currentPage: number;
-    lastPage:    number;
+    lastPage: number;
     hasNextPage: boolean;
-    perPage:     number;
+    perPage: number;
 }
