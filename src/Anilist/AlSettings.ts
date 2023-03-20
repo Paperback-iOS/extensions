@@ -1,18 +1,17 @@
-import { DUINavigationButton,
-    SourceStateManager } from '@paperback/types'
+import {
+    DUINavigationButton,
+    SourceStateManager
+} from '@paperback/types'
+
 export const getdefaultStatus = async (stateManager: SourceStateManager): Promise<string[]> => {
     return (await stateManager.retrieve('defaultStatus') as string[]) ?? ['NONE']
 }
+
 export const trackerSettings = (stateManager: SourceStateManager): DUINavigationButton => {
     return App.createDUINavigationButton({
         id: 'tracker_settings',
         label: 'Tracker Settings',
         form: App.createDUIForm({
-            onSubmit: async (values: any) => {
-                await Promise.all([
-                    stateManager.store('defaultStatus', values.defaultStatus)
-                ])
-            },
             sections: () => {
                 return Promise.resolve([
                     App.createDUISection({
@@ -24,7 +23,8 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
                                 label: 'Default Status',
                                 allowsMultiselect: false,
                                 value: App.createDUIBinding({
-                                    get: () => getdefaultStatus(stateManager)
+                                    get: () => getdefaultStatus(stateManager),
+                                    set: async (newValue) => await stateManager.store('defaultStatus', newValue)
                                 }),
                                 labelResolver: async (value) => {
                                     switch (value) {

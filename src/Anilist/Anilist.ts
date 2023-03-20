@@ -1,4 +1,5 @@
-import { ContentRating,
+import {
+    ContentRating,
     DUIForm,
     PagedResults,
     SearchRequest,
@@ -6,41 +7,50 @@ import { ContentRating,
     SourceInfo,
     Request,
     Response,
-    TrackerActionQueue, 
+    TrackerActionQueue,
     Searchable,
     MangaProgressProviding,
     SourceManga,
     MangaProgress,
-    SourceIntents} from '@paperback/types'
-import { deleteMangaProgressMutation,
+    SourceIntents
+} from '@paperback/types'
+
+import {
+    deleteMangaProgressMutation,
     getMangaProgressQuery,
     getMangaQuery,
     GraphQLQuery,
     saveMangaProgressMutation,
     searchMangaQuery,
-    userProfileQuery } from './models/graphql-queries'
+    userProfileQuery
+} from './models/graphql-queries'
+
 import * as AnilistUser from './models/anilist-user'
 import * as AnilistPage from './models/anilist-page'
 import * as AnilistManga from './models/anilist-manga'
 import { AnilistResult } from './models/anilist-result'
-import { getdefaultStatus,
-    trackerSettings } from './AlSettings'
+
+import {
+    getdefaultStatus,
+    trackerSettings
+} from './AlSettings'
+
 const ANILIST_GRAPHQL_ENDPOINT = 'https://graphql.anilist.co/'
-const FALLBACK_IMAGE = 'https://via.placeholder.com/100x150'
+
 export const AnilistInfo: SourceInfo = {
     name: 'Anilist',
-    author: 'Faizan Durrani',
+    author: 'Faizan Durrani ♥ Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.0.11',
+    version: '1.1.0',
     description: 'Anilist Tracker',
-    authorWebsite: 'faizandurrani.github.io',
     websiteBaseURL: 'https://anilist.co',
-    intents: SourceIntents.MANGA_TRACKING |
-     SourceIntents.SETTINGS_UI
+    intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
 }
 
 export class Anilist implements Searchable, MangaProgressProviding {
+    stateManager = App.createSourceStateManager();
+
     requestManager = App.createRequestManager({
         requestsPerSecond: 2.5,
         requestTimeout: 20_000,
@@ -65,16 +75,12 @@ export class Anilist implements Searchable, MangaProgressProviding {
             }
         }
     });
-    
-    stateManager = App.createSourceStateManager();
 
     accessToken = {
         get: async (): Promise<string | undefined> => {
             return this.stateManager.keychain.retrieve('access_token') as Promise<string | undefined>
         },
         set: async (token: string | undefined): Promise<void> => {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             await this.stateManager.keychain.store('access_token', token)
             await this.userInfo.refresh()
         },
@@ -82,6 +88,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
             return (await this.accessToken.get()) != null
         }
     };
+
     userInfo = {
         get: async (): Promise<AnilistUser.Viewer | undefined> => {
             return this.stateManager.retrieve('userInfo') as Promise<AnilistUser.Viewer | undefined>
@@ -103,21 +110,25 @@ export class Anilist implements Searchable, MangaProgressProviding {
             await this.stateManager.store('userInfo', userInfo)
         }
     };
-    
+
     async getSearchResults(query: SearchRequest, metadata: unknown): Promise<PagedResults> {
         const pageInfo = metadata as AnilistPage.PageInfo | undefined
         // If there are no more results, we don't want to make extra calls to Anilist
         if (pageInfo?.hasNextPage === false) {
             return App.createPagedResults({ results: [], metadata: pageInfo })
         }
+
         const nextPage = (pageInfo?.currentPage ?? 0) + 1
         const response = await this.requestManager.schedule(App.createRequest({
             url: ANILIST_GRAPHQL_ENDPOINT,
             method: 'POST',
             data: searchMangaQuery(nextPage, query.title ?? '')
         }), 1)
+
         const anilistPage = AnilistResult<AnilistPage.Result>(response.data).data?.Page
-        console.log(JSON.stringify(anilistPage, null, 2))
+
+        //console.log(JSON.stringify(anilistPage, null, 2)) // Log request data
+
         return App.createPagedResults({
             results: anilistPage?.media.map(manga => App.createPartialSourceManga({
                 image: manga.coverImage.large ?? '',
@@ -152,6 +163,8 @@ export class Anilist implements Searchable, MangaProgressProviding {
     }
 
     async getMangaProgressManagementForm(mangaId: string): Promise<DUIForm> {
+        const tempData: any = {} // Temp solution, app is ass
+
         return App.createDUIForm({
             sections: async () => {
                 const [response] = await Promise.all([
@@ -179,10 +192,12 @@ export class Anilist implements Searchable, MangaProgressProviding {
                         })
                     ]
                 }
-                
+
                 if (anilistManga == null) {
                     throw new Error(`Unable to find Manga on Anilist with id ${mangaId}`)
                 }
+
+                Object.assign(tempData, { id: anilistManga.mediaListEntry?.id, mediaId: anilistManga.id }) // Temp solution
 
                 return [
                     App.createDUISection({
@@ -191,12 +206,13 @@ export class Anilist implements Searchable, MangaProgressProviding {
                         rows: async () => [
                             App.createDUIHeader({
                                 id: 'header',
-                                imageUrl: user.avatar?.large ?? FALLBACK_IMAGE,
+                                imageUrl: user.avatar?.large || '',
                                 title: user.name ?? 'NOT LOGGED IN',
                                 subtitle: ''
                             })
                         ]
                     }),
+                    // Static items
                     App.createDUISection({
                         id: 'information',
                         header: 'Information',
@@ -230,16 +246,18 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             }),
                             App.createDUILabel({
                                 id: 'mangaStatus',
-                                value: anilistManga.status ?? 'N/A',
+                                value: this.formatStatus(anilistManga.status),
                                 label: 'Status'
                             }),
                             App.createDUILabel({
                                 id: 'mangaIsAdult',
-                                value: anilistManga.isAdult?.toString() ?? 'N/A',
+                                value: anilistManga.isAdult ? 'Yes' : 'No',
                                 label: 'Is Adult'
                             })
                         ]
                     }),
+                    // User interactive items
+                    // Status
                     App.createDUISection({
                         id: 'trackStatus',
                         header: 'Manga Status',
@@ -248,23 +266,12 @@ export class Anilist implements Searchable, MangaProgressProviding {
                         rows: async () => [
                             App.createDUISelect({
                                 id: 'status',
-                                value: App.createDUIBinding({
-                                    get: async () => anilistManga.mediaListEntry?.status
-                                        ? [anilistManga.mediaListEntry.status]
-                                        : (await getdefaultStatus(this.stateManager))
-                                }),
+                                //@ts-ignore
+                                value: anilistManga.mediaListEntry?.status ? [anilistManga.mediaListEntry.status] : (await getdefaultStatus(this.stateManager)),
                                 allowsMultiselect: false,
                                 label: 'Status',
                                 labelResolver: async (value) => {
-                                    switch (value) {
-                                        case 'CURRENT': return 'Reading'
-                                        case 'PLANNING': return 'Planned'
-                                        case 'COMPLETED': return 'Completed'
-                                        case 'DROPPED': return 'Dropped'
-                                        case 'PAUSED': return 'On-Hold'
-                                        case 'REPEATING': return 'Re-Reading'
-                                        default: return 'None'
-                                    }
+                                    return this.formatStatus(value)
                                 },
                                 options: [
                                     'NONE',
@@ -278,6 +285,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             })
                         ]
                     }),
+                    // Progress
                     App.createDUISection({
                         id: 'manage',
                         header: 'Progress',
@@ -286,23 +294,22 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             App.createDUIStepper({
                                 id: 'progress',
                                 label: 'Chapter',
-                                value: App.createDUIBinding({
-                                    get: async () => anilistManga.mediaListEntry?.progress ?? 0 
-                                }),
+                                //@ts-ignore
+                                value: anilistManga.mediaListEntry?.progress ?? 0,
                                 min: 0,
                                 step: 1
                             }),
                             App.createDUIStepper({
                                 id: 'progressVolumes',
                                 label: 'Volume',
-                                value: App.createDUIBinding({
-                                    get: async () => anilistManga.mediaListEntry?.progressVolumes ?? 0 
-                                }),
+                                //@ts-ignore
+                                value: anilistManga.mediaListEntry?.progressVolumes ?? 0,
                                 min: 0,
                                 step: 1
                             })
                         ]
                     }),
+                    // Rating
                     App.createDUISection({
                         id: 'rateSection',
                         header: 'Rating',
@@ -312,15 +319,15 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             App.createDUIStepper({
                                 id: 'score',
                                 label: 'Score',
-                                value: App.createDUIBinding({
-                                    get: async () => anilistManga.mediaListEntry?.score ?? 0
-                                }),
+                                //@ts-ignore
+                                value: anilistManga.mediaListEntry?.score ?? 0,
                                 min: 0,
                                 max: this.scoreFormatLimit(user.mediaListOptions?.scoreFormat ?? 'POINT_10'),
                                 step: user.mediaListOptions?.scoreFormat?.includes('DECIMAL') === true ? 0.1 : 1
                             })
                         ]
                     }),
+                    // Notes
                     App.createDUISection({
                         id: 'mangaNotes',
                         header: 'Notes',
@@ -329,23 +336,32 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             App.createDUIInputField({
                                 id: 'notes',
                                 label: 'Notes',
-                                value: App.createDUIBinding({ get: async () => anilistManga.mediaListEntry?.notes ?? '' }),
+                                //@ts-ignore
+                                value: anilistManga.mediaListEntry?.notes ?? ''
                             })
                         ]
                     })
                 ]
             },
             onSubmit: async (values) => {
+
+                console.log(JSON.stringify(values, null, 2)) // Log new values
+
                 let mutation: GraphQLQuery
                 const status = values['status']?.[0] ?? ''
-                const id = values['id'] != null ? Number(values['id']) : undefined
+                const id = Number(tempData.id) //values['id'] != null ? Number(values['id']) : undefined
+                const mediaId = Number(tempData.mediaId) //Number(values['mediaId'])
+
+                if (isNaN(id) || isNaN(mediaId)) { // If either the "tracking id" or "mediaId" (mangaId) is missing, abort the request!
+                    throw new Error(`Either id (${id}) or mediaId (${mediaId}) is NaN!`)
+                }
+
                 if (status == 'NONE' && id != null) {
                     mutation = deleteMangaProgressMutation(id)
-                }
-                else {
+                } else {
                     mutation = saveMangaProgressMutation({
                         id: id,
-                        mediaId: Number(values['mediaId']),
+                        mediaId: mangaId,
                         status: status,
                         notes: values['notes'],
                         progress: values['progress'],
@@ -353,7 +369,9 @@ export class Anilist implements Searchable, MangaProgressProviding {
                         score: Number(values['score'])
                     })
                 }
-                console.log(JSON.stringify(mutation, null, 2))
+
+                console.log(JSON.stringify(mutation, null, 2)) // Log request data
+
                 await this.requestManager.schedule(App.createRequest({
                     url: ANILIST_GRAPHQL_ENDPOINT,
                     method: 'POST',
@@ -369,10 +387,12 @@ export class Anilist implements Searchable, MangaProgressProviding {
             method: 'POST',
             data: getMangaQuery(parseInt(mangaId))
         }), 1)
+
         const anilistManga = AnilistResult<AnilistManga.Result>(response.data).data?.Media
         if (anilistManga == null) {
             return Promise.reject()
         }
+
         return App.createSourceManga({
             id: mangaId,
             mangaInfo: App.createMangaInfo({
@@ -390,8 +410,6 @@ export class Anilist implements Searchable, MangaProgressProviding {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 status: anilistManga.status,
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
                 banner: anilistManga.bannerImage
             })
         })
@@ -404,7 +422,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
             isHidden: false,
             rows: async () => {
                 const isLoggedIn = await this.userInfo.isLoggedIn()
-                if (isLoggedIn)
+                if (isLoggedIn) {
                     return [
                         trackerSettings(this.stateManager),
                         App.createDUILabel({
@@ -420,7 +438,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             }
                         })
                     ]
-                else
+                } else {
                     return [
                         trackerSettings(this.stateManager),
                         App.createDUIOAuthButton({
@@ -436,6 +454,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             }
                         })
                     ]
+                }
             }
         })
     }
@@ -444,46 +463,68 @@ export class Anilist implements Searchable, MangaProgressProviding {
         await this.userInfo.refresh()
 
         const chapterReadActions = await actionQueue.queuedChapterReadActions()
-        
+
         for (const readAction of chapterReadActions) {
             try {
                 let params = {}
+
                 if (Math.floor(readAction.chapterNumber) == 1 && !readAction.volumeNumber) {
                     params = {
                         mediaId: readAction.mangaId,
                         progress: 1,
                         progressVolumes: 1
                     }
-                }
-                else {
+                } else {
                     params = {
                         mediaId: readAction.mangaId,
                         progress: Math.floor(readAction.chapterNumber),
                         progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : undefined
                     }
                 }
+
                 const response = await this.requestManager.schedule(App.createRequest({
                     url: ANILIST_GRAPHQL_ENDPOINT,
                     method: 'POST',
                     data: saveMangaProgressMutation(params)
                 }), 0)
+
                 if (response.status < 400) {
                     await actionQueue.discardChapterReadAction(readAction)
-                }
-                else {
-                    console.log(`action failed: ${response.data}`)
+                } else {
+                    console.log(`Action failed: ${response.data}`)
                     await actionQueue.retryChapterReadAction(readAction)
                 }
-            }
-            catch (error) {
+
+            } catch (error) {
                 console.log(error)
                 await actionQueue.retryChapterReadAction(readAction)
             }
         }
     }
 
+    // Utility
     scoreFormatLimit(format: AnilistUser.ScoreFormat): number | undefined {
         const extracted = /\d+/gi.exec(format)?.[0]
         return extracted != null ? Number(extracted) : undefined
+    }
+
+    formatStatus(value: string | undefined): string {
+        switch (value) {
+            case 'CURRENT': return 'Reading'
+            case 'PLANNING': return 'Planned'
+            case 'COMPLETED': return 'Completed'
+            case 'DROPPED': return 'Dropped'
+            case 'PAUSED': return 'On-Hold'
+            case 'REPEATING': return 'Re-Reading'
+
+            case 'FINISHED': return 'Finished'
+            case 'RELEASING': return 'Releasing'
+            case 'NOT_YET_RELEASED': return 'Not Yet Released'
+            case 'CANCELLED': return 'Cancelled'
+            case 'HIATUS': return 'Hiatus'
+
+            case 'NONE': return 'None'
+            default: return 'N/A'
+        }
     }
 }

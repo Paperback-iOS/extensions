@@ -1,7 +1,7 @@
 export function AnilistResult<Data>(json: string | unknown): AnilistResult<Data> {
     const result: AnilistResult<Data> = typeof json == 'string' ? JSON.parse(json) : json
 
-    if(result.errors?.length ?? 0 > 0) {
+    if (result.errors?.length ?? 0 > 0) {
         result.errors?.map(error => {
             console.log(`[ANILIST-ERROR(${error.status})] ${error.message}`)
         })
@@ -12,10 +12,10 @@ export function AnilistResult<Data>(json: string | unknown): AnilistResult<Data>
 }
 
 interface AnilistResult<Data> {
-    data?: Data
-    errors?: AnilistError[]
+    data?: Data;
+    errors?: AnilistError[];
 }
 interface AnilistError {
-    message: string
-    status: number
+    message: string;
+    status: number;
 }

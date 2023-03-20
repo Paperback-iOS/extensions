@@ -3,11 +3,11 @@ export interface Result {
 }
 
 export interface Viewer {
-    id?:               number;
-    name?:             string;
-    options?:          Options;
+    id?: number;
+    name?: string;
+    options?: Options;
     mediaListOptions?: MediaListOptions;
-    avatar?:           Avatar;
+    avatar?: Avatar;
 }
 
 export interface Avatar {
@@ -15,12 +15,12 @@ export interface Avatar {
 }
 
 export interface MediaListOptions {
-    mangaList?:   MangaList;
+    mangaList?: MangaList;
     scoreFormat?: ScoreFormat;
 }
 
 export type ScoreFormat = 'POINT_100'
-| 'POINT_10_DECIMAL' 
+| 'POINT_10_DECIMAL'
 | 'POINT_10'
 | 'POINT_5'
 | 'POINT_3'
