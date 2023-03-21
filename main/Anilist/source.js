@@ -459,12 +459,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.trackerSettings = exports.getdefaultStatus = void 0;
-const getdefaultStatus = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
+exports.trackerSettings = exports.getDefaultPrivate = exports.getDefaultStatus = void 0;
+const getDefaultStatus = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     return (_a = (yield stateManager.retrieve('defaultStatus'))) !== null && _a !== void 0 ? _a : ['NONE'];
 });
-exports.getdefaultStatus = getdefaultStatus;
+exports.getDefaultStatus = getDefaultStatus;
+const getDefaultPrivate = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    return (_b = (yield stateManager.retrieve('defaultPrivate'))) !== null && _b !== void 0 ? _b : false;
+});
+exports.getDefaultPrivate = getDefaultPrivate;
 const trackerSettings = (stateManager) => {
     return App.createDUINavigationButton({
         id: 'tracker_settings',
@@ -482,7 +487,7 @@ const trackerSettings = (stateManager) => {
                                     label: 'Default Status',
                                     allowsMultiselect: false,
                                     value: App.createDUIBinding({
-                                        get: () => (0, exports.getdefaultStatus)(stateManager),
+                                        get: () => (0, exports.getDefaultStatus)(stateManager),
                                         set: (newValue) => __awaiter(void 0, void 0, void 0, function* () { return yield stateManager.store('defaultStatus', newValue); })
                                     }),
                                     labelResolver: (value) => __awaiter(void 0, void 0, void 0, function* () {
@@ -505,6 +510,14 @@ const trackerSettings = (stateManager) => {
                                         'PAUSED',
                                         'REPEATING'
                                     ]
+                                }),
+                                App.createDUISwitch({
+                                    id: 'defaultPrivate',
+                                    label: 'Private by Default',
+                                    value: App.createDUIBinding({
+                                        get: () => (0, exports.getDefaultPrivate)(stateManager),
+                                        set: (newValue) => __awaiter(void 0, void 0, void 0, function* () { return yield stateManager.store('defaultPrivate', newValue); })
+                                    }),
                                 })
                             ];
                         })
@@ -539,7 +552,7 @@ exports.AnilistInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: types_1.ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.0',
+    version: '1.1.1',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: types_1.SourceIntents.MANGA_TRACKING | types_1.SourceIntents.SETTINGS_UI
@@ -766,7 +779,7 @@ class Anilist {
                                     App.createDUISelect({
                                         id: 'status',
                                         //@ts-ignore
-                                        value: ((_p = anilistManga.mediaListEntry) === null || _p === void 0 ? void 0 : _p.status) ? [anilistManga.mediaListEntry.status] : (yield (0, AlSettings_1.getdefaultStatus)(this.stateManager)),
+                                        value: ((_p = anilistManga.mediaListEntry) === null || _p === void 0 ? void 0 : _p.status) ? [anilistManga.mediaListEntry.status] : (yield (0, AlSettings_1.getDefaultStatus)(this.stateManager)),
                                         allowsMultiselect: false,
                                         label: 'Status',
                                         labelResolver: (value) => __awaiter(this, void 0, void 0, function* () {
@@ -833,19 +846,36 @@ class Anilist {
                                 ];
                             })
                         }),
+                        // Private
+                        App.createDUISection({
+                            id: 'mangaPrivate',
+                            header: 'Private',
+                            isHidden: false,
+                            rows: () => __awaiter(this, void 0, void 0, function* () {
+                                var _0;
+                                return [
+                                    App.createDUISwitch({
+                                        id: 'private',
+                                        label: 'Private',
+                                        //@ts-ignore
+                                        value: ((_0 = anilistManga.mediaListEntry) === null || _0 === void 0 ? void 0 : _0.private) ? [anilistManga.mediaListEntry.private] : (yield (0, AlSettings_1.getDefaultPrivate)(this.stateManager))
+                                    })
+                                ];
+                            })
+                        }),
                         // Notes
                         App.createDUISection({
                             id: 'mangaNotes',
                             header: 'Notes',
                             isHidden: false,
                             rows: () => __awaiter(this, void 0, void 0, function* () {
-                                var _0, _1;
+                                var _1, _2;
                                 return [
                                     App.createDUIInputField({
                                         id: 'notes',
                                         label: 'Notes',
                                         //@ts-ignore
-                                        value: (_1 = (_0 = anilistManga.mediaListEntry) === null || _0 === void 0 ? void 0 : _0.notes) !== null && _1 !== void 0 ? _1 : ''
+                                        value: (_2 = (_1 = anilistManga.mediaListEntry) === null || _1 === void 0 ? void 0 : _1.notes) !== null && _2 !== void 0 ? _2 : ''
                                     })
                                 ];
                             })
@@ -853,26 +883,23 @@ class Anilist {
                     ];
                 }),
                 onSubmit: (values) => __awaiter(this, void 0, void 0, function* () {
-                    var _2, _3;
-                    console.log(JSON.stringify(values, null, 2)); // Log new values
+                    var _3, _4;
                     let mutation;
-                    const status = (_3 = (_2 = values['status']) === null || _2 === void 0 ? void 0 : _2[0]) !== null && _3 !== void 0 ? _3 : '';
-                    const id = Number(tempData.id); //values['id'] != null ? Number(values['id']) : undefined
+                    const status = (_4 = (_3 = values['status']) === null || _3 === void 0 ? void 0 : _3[0]) !== null && _4 !== void 0 ? _4 : '';
+                    const id = tempData.id ? Number(tempData.id) : undefined; //values['id'] != null ? Number(values['id']) : undefined
                     const mediaId = Number(tempData.mediaId); //Number(values['mediaId'])
-                    if (isNaN(id) || isNaN(mediaId)) { // If either the "tracking id" or "mediaId" (mangaId) is missing, abort the request!
-                        throw new Error(`Either id (${id}) or mediaId (${mediaId}) is NaN!`);
-                    }
                     if (status == 'NONE' && id != null) {
                         mutation = (0, graphql_queries_1.deleteMangaProgressMutation)(id);
                     }
                     else {
                         mutation = (0, graphql_queries_1.saveMangaProgressMutation)({
                             id: id,
-                            mediaId: mangaId,
+                            mediaId: mediaId,
                             status: status,
                             notes: values['notes'],
                             progress: values['progress'],
                             progressVolumes: values['progressVolumes'],
+                            private: values['private'],
                             score: Number(values['score'])
                         });
                     }
@@ -1181,8 +1208,8 @@ const getMangaProgressQuery = (id) => ({
 });
 exports.getMangaProgressQuery = getMangaProgressQuery;
 const saveMangaProgressMutation = (variables) => ({
-    query: `mutation($id: Int, $mediaId: Int, $status: MediaListStatus, $score: Float, $progress: Int, $progressVolumes: Int, $notes: String) {
-        SaveMediaListEntry(id: $id, mediaId: $mediaId, status: $status, score: $score, progress: $progress, progressVolumes: $progressVolumes, notes: $notes){
+    query: `mutation($id: Int, $mediaId: Int, $status: MediaListStatus, $score: Float, $progress: Int, $progressVolumes: Int, $notes: String, $private: Boolean) {
+        SaveMediaListEntry(id: $id, mediaId: $mediaId, status: $status, score: $score, progress: $progress, progressVolumes: $progressVolumes, notes: $notes, private: $private){
             id
         }
     }`,
