@@ -133,14 +133,15 @@ export interface SaveMangaProgressVariables {
     mediaId?: number | string;
     status?: string;
     score?: number;
+    private?: boolean;
     progress?: number;
     progressVolumes?: number;
     notes?: string;
 }
 
 export const saveMangaProgressMutation = (variables: SaveMangaProgressVariables): GraphQLQuery => ({
-    query: `mutation($id: Int, $mediaId: Int, $status: MediaListStatus, $score: Float, $progress: Int, $progressVolumes: Int, $notes: String) {
-        SaveMediaListEntry(id: $id, mediaId: $mediaId, status: $status, score: $score, progress: $progress, progressVolumes: $progressVolumes, notes: $notes){
+    query: `mutation($id: Int, $mediaId: Int, $status: MediaListStatus, $score: Float, $progress: Int, $progressVolumes: Int, $notes: String, $private: Boolean) {
+        SaveMediaListEntry(id: $id, mediaId: $mediaId, status: $status, score: $score, progress: $progress, progressVolumes: $progressVolumes, notes: $notes, private: $private){
             id
         }
     }`,

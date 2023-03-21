@@ -31,7 +31,8 @@ import * as AnilistManga from './models/anilist-manga'
 import { AnilistResult } from './models/anilist-result'
 
 import {
-    getdefaultStatus,
+    getDefaultPrivate,
+    getDefaultStatus,
     trackerSettings
 } from './AlSettings'
 
@@ -42,7 +43,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.0',
+    version: '1.1.1',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -267,7 +268,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             App.createDUISelect({
                                 id: 'status',
                                 //@ts-ignore
-                                value: anilistManga.mediaListEntry?.status ? [anilistManga.mediaListEntry.status] : (await getdefaultStatus(this.stateManager)),
+                                value: anilistManga.mediaListEntry?.status ? [anilistManga.mediaListEntry.status] : (await getDefaultStatus(this.stateManager)),
                                 allowsMultiselect: false,
                                 label: 'Status',
                                 labelResolver: async (value) => {
@@ -327,6 +328,20 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             })
                         ]
                     }),
+                    // Private
+                    App.createDUISection({
+                        id: 'mangaPrivate',
+                        header: 'Private',
+                        isHidden: false,
+                        rows: async () => [
+                            App.createDUISwitch({
+                                id: 'private',
+                                label: 'Private',
+                                //@ts-ignore
+                                value: anilistManga.mediaListEntry?.private ? [anilistManga.mediaListEntry.private] : (await getDefaultPrivate(this.stateManager))
+                            })
+                        ]
+                    }),
                     // Notes
                     App.createDUISection({
                         id: 'mangaNotes',
@@ -345,27 +360,22 @@ export class Anilist implements Searchable, MangaProgressProviding {
             },
             onSubmit: async (values) => {
 
-                console.log(JSON.stringify(values, null, 2)) // Log new values
-
                 let mutation: GraphQLQuery
                 const status = values['status']?.[0] ?? ''
-                const id = Number(tempData.id) //values['id'] != null ? Number(values['id']) : undefined
+                const id = tempData.id ? Number(tempData.id) : undefined //values['id'] != null ? Number(values['id']) : undefined
                 const mediaId = Number(tempData.mediaId) //Number(values['mediaId'])
-
-                if (isNaN(id) || isNaN(mediaId)) { // If either the "tracking id" or "mediaId" (mangaId) is missing, abort the request!
-                    throw new Error(`Either id (${id}) or mediaId (${mediaId}) is NaN!`)
-                }
 
                 if (status == 'NONE' && id != null) {
                     mutation = deleteMangaProgressMutation(id)
                 } else {
                     mutation = saveMangaProgressMutation({
                         id: id,
-                        mediaId: mangaId,
+                        mediaId: mediaId,
                         status: status,
                         notes: values['notes'],
                         progress: values['progress'],
                         progressVolumes: values['progressVolumes'],
+                        private: values['private'],
                         score: Number(values['score'])
                     })
                 }
