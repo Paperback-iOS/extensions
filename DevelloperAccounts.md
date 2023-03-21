@@ -4,7 +4,7 @@ These are accounts to use while developing tracker extensions for Paperback. Use
 
 **Protonmail:** Use this mail account for all tracker extensions.
 
-- email: pbioseta@proton.me
+- E-mail: pbioseta@proton.me
 - Password: ibRrF23:nFA5Wyj
 
 ---
@@ -13,5 +13,5 @@ These are accounts to use while developing tracker extensions for Paperback. Use
 
 **Anilist:**
 
-- email: pbioseta@proton.me
+- E-mail: pbioseta@proton.me
 - Password: ibRrF23:nFA5Wyj
