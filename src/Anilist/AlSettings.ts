@@ -3,8 +3,11 @@ import {
     SourceStateManager
 } from '@paperback/types'
 
-export const getdefaultStatus = async (stateManager: SourceStateManager): Promise<string[]> => {
+export const getDefaultStatus = async (stateManager: SourceStateManager): Promise<string[]> => {
     return (await stateManager.retrieve('defaultStatus') as string[]) ?? ['NONE']
+}
+export const getDefaultPrivate = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('defaultPrivate') as boolean) ?? false
 }
 
 export const trackerSettings = (stateManager: SourceStateManager): DUINavigationButton => {
@@ -23,7 +26,7 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
                                 label: 'Default Status',
                                 allowsMultiselect: false,
                                 value: App.createDUIBinding({
-                                    get: () => getdefaultStatus(stateManager),
+                                    get: () => getDefaultStatus(stateManager),
                                     set: async (newValue) => await stateManager.store('defaultStatus', newValue)
                                 }),
                                 labelResolver: async (value) => {
@@ -46,6 +49,14 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
                                     'PAUSED',
                                     'REPEATING'
                                 ]
+                            }),
+                            App.createDUISwitch({
+                                id: 'defaultPrivate',
+                                label: 'Private by Default',
+                                value: App.createDUIBinding({
+                                    get: () => getDefaultPrivate(stateManager),
+                                    set: async (newValue) => await stateManager.store('defaultPrivate', newValue)
+                                }),
                             })
                         ]
                     })
