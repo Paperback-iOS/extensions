@@ -1,4 +1,4 @@
-# Develloper Accounts
+# Developer Accounts
 
 These are accounts to use while developing tracker extensions for Paperback. Use these to prevent possibly damaging your personal accounts.
 
