@@ -43,7 +43,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.1',
+    version: '1.1.2',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -338,7 +338,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                                 id: 'private',
                                 label: 'Private',
                                 //@ts-ignore
-                                value: anilistManga.mediaListEntry?.private ? [anilistManga.mediaListEntry.private] : (await getDefaultPrivate(this.stateManager))
+                                value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : (await getDefaultPrivate(this.stateManager))
                             })
                         ]
                     }),

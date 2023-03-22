@@ -7,7 +7,7 @@ export const getDefaultStatus = async (stateManager: SourceStateManager): Promis
     return (await stateManager.retrieve('defaultStatus') as string[]) ?? ['NONE']
 }
 export const getDefaultPrivate = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('defaultPrivate') as boolean) ?? false
+    return (await stateManager.retrieve('defaultPrivate') as boolean | undefined) ?? false
 }
 
 export const trackerSettings = (stateManager: SourceStateManager): DUINavigationButton => {
