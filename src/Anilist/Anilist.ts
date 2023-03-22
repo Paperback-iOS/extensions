@@ -31,8 +31,9 @@ import * as AnilistManga from './models/anilist-manga'
 import { AnilistResult } from './models/anilist-result'
 
 import {
-    getDefaultPrivate,
     getDefaultStatus,
+    getDefaultPrivate,
+    getDefaultHiddenFromStatusLists,
     trackerSettings
 } from './AlSettings'
 
@@ -43,7 +44,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.1',
+    version: '1.1.2',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -342,6 +343,20 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             })
                         ]
                     }),
+                    // Hidden From Status Lists
+                    App.createDUISection({
+                        id: 'mangaHiddenFromStatusLists',
+                        header: 'Hidden from Status Lists',
+                        isHidden: false,
+                        rows: async () => [
+                            App.createDUISwitch({
+                                id: 'hiddenFromStatusLists',
+                                label: 'Hidden from Status Lists',
+                                //@ts-ignore
+                                value: anilistManga.mediaListEntry?.hiddenFromStatusLists ? [anilistManga.mediaListEntry.hiddenFromStatusLists] : (await getDefaultHiddenFromStatusLists(this.stateManager))
+                            })
+                        ]
+                    }),
                     // Notes
                     App.createDUISection({
                         id: 'mangaNotes',
@@ -376,6 +391,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                         progress: values['progress'],
                         progressVolumes: values['progressVolumes'],
                         private: values['private'],
+                        hiddenFromStatusLists: values['hiddenFromStatusLists'],
                         score: Number(values['score'])
                     })
                 }
