@@ -44,7 +44,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.2',
+    version: '1.1.3',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -329,31 +329,43 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             })
                         ]
                     }),
-                    // Private
+                    // privacy
                     App.createDUISection({
-                        id: 'mangaPrivate',
-                        header: 'Private',
+                        id: 'privacy_settings',
+                        header: 'Privacy Settings',
+                        footer: 'Not fully supported yet', // You can get the setting from AniList but cannot change it from in the app yet
                         isHidden: false,
                         rows: async () => [
-                            App.createDUISwitch({
-                                id: 'private',
-                                label: 'Private',
-                                //@ts-ignore
-                                value: anilistManga.mediaListEntry?.private ? [anilistManga.mediaListEntry.private] : (await getDefaultPrivate(this.stateManager))
-                            })
-                        ]
-                    }),
-                    // Hidden From Status Lists
-                    App.createDUISection({
-                        id: 'mangaHiddenFromStatusLists',
-                        header: 'Hidden from Status Lists',
-                        isHidden: false,
-                        rows: async () => [
-                            App.createDUISwitch({
-                                id: 'hiddenFromStatusLists',
-                                label: 'Hidden from Status Lists',
-                                //@ts-ignore
-                                value: anilistManga.mediaListEntry?.hiddenFromStatusLists ? [anilistManga.mediaListEntry.hiddenFromStatusLists] : (await getDefaultHiddenFromStatusLists(this.stateManager))
+                            App.createDUINavigationButton({
+                                id: 'privacy',
+                                label: 'Privacy',
+                                form: App.createDUIForm({
+                                    sections: () => {
+                                        return Promise.resolve([
+                                            App.createDUISection({
+                                                id: 'privacy',
+                                                isHidden: false,
+                                                rows: async () => [
+                                                    App.createDUISwitch({
+                                                        id: 'private',
+                                                        label: 'Private',
+                                                        //@ts-ignore
+                                                        value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : (await getDefaultPrivate(this.stateManager))
+                                                    }),
+                                                    App.createDUISwitch({
+                                                        id: 'hiddenFromStatusLists',
+                                                        label: 'Hide from Status Lists',
+                                                        //@ts-ignore
+                                                        value: anilistManga.mediaListEntry?.hiddenFromStatusLists ? anilistManga.mediaListEntry.hiddenFromStatusLists : (await getDefaultHiddenFromStatusLists(this.stateManager))
+                                                    })
+                                                ]
+                                            })
+                                        ])
+                                    },
+                                    onSubmit: async () => {
+                                        return
+                                    }
+                                })
                             })
                         ]
                     }),

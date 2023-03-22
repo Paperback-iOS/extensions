@@ -103,6 +103,7 @@ export const getMangaProgressQuery = (id: number): GraphQLQuery => ({
                 progress
                 progressVolumes
                 private
+                hiddenFromStatusLists
                 score
                 notes
                 advancedScores
