@@ -459,7 +459,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.trackerSettings = exports.getDefaultPrivate = exports.getDefaultStatus = void 0;
+exports.trackerSettings = exports.getDefaultHiddenFromStatusLists = exports.getDefaultPrivate = exports.getDefaultStatus = void 0;
 const getDefaultStatus = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     return (_a = (yield stateManager.retrieve('defaultStatus'))) !== null && _a !== void 0 ? _a : ['NONE'];
@@ -470,6 +470,11 @@ const getDefaultPrivate = (stateManager) => __awaiter(void 0, void 0, void 0, fu
     return (_b = (yield stateManager.retrieve('defaultPrivate'))) !== null && _b !== void 0 ? _b : false;
 });
 exports.getDefaultPrivate = getDefaultPrivate;
+const getDefaultHiddenFromStatusLists = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
+    return (_c = (yield stateManager.retrieve('defaultHiddenFromStatusLists'))) !== null && _c !== void 0 ? _c : false;
+});
+exports.getDefaultHiddenFromStatusLists = getDefaultHiddenFromStatusLists;
 const trackerSettings = (stateManager) => {
     return App.createDUINavigationButton({
         id: 'tracker_settings',
@@ -478,7 +483,8 @@ const trackerSettings = (stateManager) => {
             sections: () => {
                 return Promise.resolve([
                     App.createDUISection({
-                        id: 'settings',
+                        id: 'status_settings',
+                        header: 'Status Settings',
                         isHidden: false,
                         rows: () => __awaiter(void 0, void 0, void 0, function* () {
                             return [
@@ -510,14 +516,31 @@ const trackerSettings = (stateManager) => {
                                         'PAUSED',
                                         'REPEATING'
                                     ]
-                                }),
+                                })
+                            ];
+                        })
+                    }),
+                    App.createDUISection({
+                        id: 'privacy_settings',
+                        header: 'Privacy Settings',
+                        isHidden: false,
+                        rows: () => __awaiter(void 0, void 0, void 0, function* () {
+                            return [
                                 App.createDUISwitch({
                                     id: 'defaultPrivate',
                                     label: 'Private by Default',
                                     value: App.createDUIBinding({
                                         get: () => (0, exports.getDefaultPrivate)(stateManager),
                                         set: (newValue) => __awaiter(void 0, void 0, void 0, function* () { return yield stateManager.store('defaultPrivate', newValue); })
-                                    }),
+                                    })
+                                }),
+                                App.createDUISwitch({
+                                    id: 'defaultHiddenFromStatusLists',
+                                    label: 'Hidden from Status Lists by Default',
+                                    value: App.createDUIBinding({
+                                        get: () => (0, exports.getDefaultHiddenFromStatusLists)(stateManager),
+                                        set: (newValue) => __awaiter(void 0, void 0, void 0, function* () { return yield stateManager.store('defaultHiddenFromStatusLists', newValue); })
+                                    })
                                 })
                             ];
                         })
@@ -552,7 +575,7 @@ exports.AnilistInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: types_1.ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.2',
+    version: '1.1.3',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: types_1.SourceIntents.MANGA_TRACKING | types_1.SourceIntents.SETTINGS_UI
@@ -846,19 +869,25 @@ class Anilist {
                                 ];
                             })
                         }),
-                        // Private
+                        // privacy
                         App.createDUISection({
-                            id: 'mangaPrivate',
-                            header: 'Private',
+                            id: 'privacy_settings',
+                            header: 'Privacy Settings',
                             isHidden: false,
                             rows: () => __awaiter(this, void 0, void 0, function* () {
-                                var _0;
+                                var _0, _1;
                                 return [
                                     App.createDUISwitch({
                                         id: 'private',
                                         label: 'Private',
                                         //@ts-ignore
                                         value: ((_0 = anilistManga.mediaListEntry) === null || _0 === void 0 ? void 0 : _0.private) != undefined ? anilistManga.mediaListEntry.private : (yield (0, AlSettings_1.getDefaultPrivate)(this.stateManager))
+                                    }),
+                                    App.createDUISwitch({
+                                        id: 'hiddenFromStatusLists',
+                                        label: 'Hide from Status Lists',
+                                        //@ts-ignore
+                                        value: ((_1 = anilistManga.mediaListEntry) === null || _1 === void 0 ? void 0 : _1.hiddenFromStatusLists) != undefined ? anilistManga.mediaListEntry.hiddenFromStatusLists : (yield (0, AlSettings_1.getDefaultHiddenFromStatusLists)(this.stateManager))
                                     })
                                 ];
                             })
@@ -869,13 +898,13 @@ class Anilist {
                             header: 'Notes',
                             isHidden: false,
                             rows: () => __awaiter(this, void 0, void 0, function* () {
-                                var _1, _2;
+                                var _2, _3;
                                 return [
                                     App.createDUIInputField({
                                         id: 'notes',
                                         label: 'Notes',
                                         //@ts-ignore
-                                        value: (_2 = (_1 = anilistManga.mediaListEntry) === null || _1 === void 0 ? void 0 : _1.notes) !== null && _2 !== void 0 ? _2 : ''
+                                        value: (_3 = (_2 = anilistManga.mediaListEntry) === null || _2 === void 0 ? void 0 : _2.notes) !== null && _3 !== void 0 ? _3 : ''
                                     })
                                 ];
                             })
@@ -883,9 +912,9 @@ class Anilist {
                     ];
                 }),
                 onSubmit: (values) => __awaiter(this, void 0, void 0, function* () {
-                    var _3, _4;
+                    var _4, _5;
                     let mutation;
-                    const status = (_4 = (_3 = values['status']) === null || _3 === void 0 ? void 0 : _3[0]) !== null && _4 !== void 0 ? _4 : '';
+                    const status = (_5 = (_4 = values['status']) === null || _4 === void 0 ? void 0 : _4[0]) !== null && _5 !== void 0 ? _5 : '';
                     const id = tempData.id ? Number(tempData.id) : undefined; //values['id'] != null ? Number(values['id']) : undefined
                     const mediaId = Number(tempData.mediaId); //Number(values['mediaId'])
                     if (status == 'NONE' && id != null) {
@@ -900,6 +929,7 @@ class Anilist {
                             progress: values['progress'],
                             progressVolumes: values['progressVolumes'],
                             private: values['private'],
+                            hiddenFromStatusLists: values['hiddenFromStatusLists'],
                             score: Number(values['score'])
                         });
                     }
@@ -1182,6 +1212,7 @@ const getMangaProgressQuery = (id) => ({
                 progress
                 progressVolumes
                 private
+                hiddenFromStatusLists
                 score
                 notes
                 advancedScores
@@ -1208,8 +1239,8 @@ const getMangaProgressQuery = (id) => ({
 });
 exports.getMangaProgressQuery = getMangaProgressQuery;
 const saveMangaProgressMutation = (variables) => ({
-    query: `mutation($id: Int, $mediaId: Int, $status: MediaListStatus, $score: Float, $progress: Int, $progressVolumes: Int, $notes: String, $private: Boolean) {
-        SaveMediaListEntry(id: $id, mediaId: $mediaId, status: $status, score: $score, progress: $progress, progressVolumes: $progressVolumes, notes: $notes, private: $private){
+    query: `mutation($id: Int, $mediaId: Int, $status: MediaListStatus, $score: Float, $progress: Int, $progressVolumes: Int, $notes: String, $private: Boolean, $hiddenFromStatusLists: Boolean) {
+        SaveMediaListEntry(id: $id, mediaId: $mediaId, status: $status, score: $score, progress: $progress, progressVolumes: $progressVolumes, notes: $notes, private: $private, hiddenFromStatusLists: $hiddenFromStatusLists){
             id
         }
     }`,
