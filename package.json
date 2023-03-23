@@ -1,9 +1,10 @@
 {
   "name": "extensions",
-  "version": "1.1.0",
-  "description": "Default trackers for Paperback 0.8.",
+  "version": "1.1.2",
+  "description": "Default extensions for Paperback 0.8.",
   "main": "lib/index.js",
   "scripts": {
+    "migrate": "npx paperback migrate",
     "bundle": "npx paperback bundle",
     "serve": "npx paperback serve"
   },

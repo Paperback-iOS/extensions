@@ -9,6 +9,9 @@ export const getDefaultStatus = async (stateManager: SourceStateManager): Promis
 export const getDefaultPrivate = async (stateManager: SourceStateManager): Promise<boolean> => {
     return (await stateManager.retrieve('defaultPrivate') as boolean | undefined) ?? false
 }
+export const getDefaultHiddenFromStatusLists = async (stateManager: SourceStateManager): Promise<boolean> => {
+    return (await stateManager.retrieve('defaultHiddenFromStatusLists') as boolean | undefined) ?? false
+}
 
 export const trackerSettings = (stateManager: SourceStateManager): DUINavigationButton => {
     return App.createDUINavigationButton({
@@ -18,7 +21,8 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
             sections: () => {
                 return Promise.resolve([
                     App.createDUISection({
-                        id: 'settings',
+                        id: 'status_settings',
+                        header: 'Status Settings',
                         isHidden: false,
                         rows: async () => [
                             App.createDUISelect({
@@ -49,14 +53,29 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
                                     'PAUSED',
                                     'REPEATING'
                                 ]
-                            }),
+                            })
+                        ]
+                    }),
+                    App.createDUISection({
+                        id: 'privacy_settings',
+                        header: 'Privacy Settings',
+                        isHidden: false,
+                        rows: async () => [
                             App.createDUISwitch({
                                 id: 'defaultPrivate',
                                 label: 'Private by Default',
                                 value: App.createDUIBinding({
                                     get: () => getDefaultPrivate(stateManager),
                                     set: async (newValue) => await stateManager.store('defaultPrivate', newValue)
-                                }),
+                                })
+                            }),
+                            App.createDUISwitch({
+                                id: 'defaultHiddenFromStatusLists',
+                                label: 'Hidden from Status Lists by Default',
+                                value: App.createDUIBinding({
+                                    get: () => getDefaultHiddenFromStatusLists(stateManager),
+                                    set: async (newValue) => await stateManager.store('defaultHiddenFromStatusLists', newValue)
+                                })
                             })
                         ]
                     })
