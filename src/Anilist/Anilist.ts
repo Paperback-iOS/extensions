@@ -44,7 +44,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.3',
+    version: '1.1.4',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -308,7 +308,15 @@ export class Anilist implements Searchable, MangaProgressProviding {
                                 value: anilistManga.mediaListEntry?.progressVolumes ?? 0,
                                 min: 0,
                                 step: 1
-                            })
+                            }),
+                            App.createDUIStepper({
+                                id: 'repeat',
+                                label: 'Re-Reads',
+                                //@ts-ignore
+                                value: anilistManga.mediaListEntry?.repeat != undefined ? anilistManga.mediaListEntry?.repeat: 0,
+                                min: 0,
+                                step: 1
+                            }),
                         ]
                     }),
                     // Rating
@@ -382,6 +390,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                         notes: values['notes'],
                         progress: values['progress'],
                         progressVolumes: values['progressVolumes'],
+                        repeat: values['repeat'],
                         private: values['private'],
                         hiddenFromStatusLists: values['hiddenFromStatusLists'],
                         score: Number(values['score'])
