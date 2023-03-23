@@ -345,7 +345,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                                 id: 'hiddenFromStatusLists',
                                 label: 'Hide from Status Lists',
                                 //@ts-ignore
-                                value: anilistManga.mediaListEntry?.hiddenFromStatusLists ? anilistManga.mediaListEntry.hiddenFromStatusLists : (await getDefaultHiddenFromStatusLists(this.stateManager))
+                                value: anilistManga.mediaListEntry?.hiddenFromStatusLists != undefined ? anilistManga.mediaListEntry.hiddenFromStatusLists : (await getDefaultHiddenFromStatusLists(this.stateManager))
                             })
                         ]
                     }),
