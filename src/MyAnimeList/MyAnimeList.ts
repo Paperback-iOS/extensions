@@ -75,10 +75,10 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
     });
 
     tokenData = {
-        get: async (): Promise<MalToken.Tokens | undefined> => {
-            return this.stateManager.keychain.retrieve('token_data') as Promise<MalToken.Tokens | undefined>
+        get: async (): Promise<MalToken.Data | undefined> => {
+            return this.stateManager.keychain.retrieve('token_data') as Promise<MalToken.Data | undefined>
         },
-        set: async (tokenData: MalToken.Tokens | undefined): Promise<void> => {
+        set: async (tokenData: MalToken.Data | undefined): Promise<void> => {
             await this.stateManager.keychain.store('token_data', tokenData)
             await this.userInfo.refresh()
         },
