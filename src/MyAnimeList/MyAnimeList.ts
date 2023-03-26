@@ -606,7 +606,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
             await this.tokenData.set({
                 expires_in: tokenBody['exp'],
                 access_token: newTokenData.access_token,
-                refresh_token: newTokenData.access_token
+                refresh_token: newTokenData.refresh_token
             })
 
         } catch (error) {
