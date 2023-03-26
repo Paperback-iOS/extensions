@@ -1,7 +1,14 @@
 # Extensions
 
-Default trackers for Paperback 0.8.
+Default extensions for [Paperback](https://paperback.moe/) 0.8.
 
-## Supported Trackers
+The extensions are either tracker extensions or the official Paperback source.
 
-- AniList
+Tracking helps you automatically send read manga chapters to supported trackers, so you can keep track of what and when you read it online.
+
+Paperback does not officially support other third party source extensions (extensions with content), so you will not find any in this repository.
+
+## Supported trackers
+
+- [AniList](https://anilist.co/)
+- [MyAnimeList](https://myanimelist.net/)
