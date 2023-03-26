@@ -18,7 +18,7 @@ import {
 import * as MalUser from './models/mal-user'
 import * as MalManga from './models/mal-manga'
 import * as MalPage from './models/mal-page'
-//import * as MalToken from './models/mal-token'
+import * as MalToken from './models/mal-token'
 import { MalResult } from './models/mal-result'
 
 import { stringify } from 'querystring'
@@ -50,14 +50,20 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
         interceptor: {
             // Authorization injector
             interceptRequest: async (request: Request): Promise<Request> => {
-                const accessToken = await this.accessToken.get()
+                const tokenData = await this.tokenData.get()
+
+                if (tokenData?.expires_in && (tokenData.expires_in - 1296000) < (Date.now() / 1000)) {
+                    console.log('Access token has expired, refreshing the access token!')
+                    await this.tokenData.refresh()
+                }
+
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...({
                         'accept': 'application/json'
                     }),
-                    ...(accessToken != null ? {
-                        'authorization': `Bearer ${accessToken}`
+                    ...(tokenData != null ? {
+                        'authorization': `Bearer ${tokenData.access_token}`
                     } : {})
                 }
                 return request
@@ -68,31 +74,19 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
         }
     });
 
-    accessToken = {
-        get: async (): Promise<string | undefined> => {
-            return this.stateManager.keychain.retrieve('access_token') as Promise<string | undefined>
+    tokenData = {
+        get: async (): Promise<MalToken.Tokens | undefined> => {
+            return this.stateManager.keychain.retrieve('token_data') as Promise<MalToken.Tokens | undefined>
         },
-        set: async (token: string | undefined): Promise<void> => {
-            await this.stateManager.keychain.store('access_token', token)
+        set: async (tokenData: MalToken.Tokens | undefined): Promise<void> => {
+            await this.stateManager.keychain.store('token_data', tokenData)
             await this.userInfo.refresh()
         },
         isValid: async (): Promise<boolean> => {
-            return (await this.accessToken.get()) != null
+            return (await this.tokenData.get()) != null
         },
         refresh: async (): Promise<void> => {
-            //await this.getRefreshToken() Not required for now!
-        }
-    };
-
-    refreshToken = {
-        get: async (): Promise<string | undefined> => {
-            return this.stateManager.keychain.retrieve('refresh_token') as Promise<string | undefined>
-        },
-        set: async (token: string | undefined): Promise<void> => {
-            await this.stateManager.keychain.store('refresh_token', token)
-        },
-        isValid: async (): Promise<boolean> => {
-            return (await this.refreshToken.get()) != null
+            await this.refreshAccessToken()
         }
     };
 
@@ -104,8 +98,8 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
             return (await this.userInfo.get()) != null
         },
         refresh: async (): Promise<void> => {
-            const accessToken = await this.accessToken.get()
-            if (accessToken == null) {
+            const tokenData = await this.tokenData.get()
+            if (tokenData == null) {
                 return this.stateManager.store('userInfo', undefined)
             }
             const response = await this.requestManager.schedule(App.createRequest({
@@ -153,8 +147,8 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
             method: 'GET'
         }), 1)
 
-
         const malManga = MalResult<MalManga.Result>(response)
+
         //console.log(JSON.stringify(malManga, null, 2)) // Log request data
 
         if (malManga == null) {
@@ -189,8 +183,8 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
         }), 1)
 
         const malManga = MalResult<MalManga.Result>(response)
-        //console.log(JSON.stringify(malManga, null, 2)) // Log request data
 
+        //console.log(JSON.stringify(malManga, null, 2)) // Log request data
 
         if (!malManga?.my_list_status) { return undefined }
 
@@ -218,6 +212,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
                 ])
 
                 const malManga = MalResult<MalManga.Result>(response)
+
                 //console.log(JSON.stringify(malManga, null, 2)) // Log request data
 
                 const user = await this.userInfo.get()
@@ -495,7 +490,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
                             id: 'logout',
                             label: 'Logout',
                             onTap: async () => {
-                                await this.accessToken.set(undefined)
+                                await this.tokenData.set(undefined)
                             }
                         })
                     ]
@@ -519,8 +514,15 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
                                 tokenEndpoint: 'https://myanimelist.net/v1/oauth2/token',
                             },
                             successHandler: async (accessToken: string, refreshToken?: string): Promise<void> => {
-                                await this.accessToken.set(accessToken)
-                                await this.refreshToken.set(refreshToken)
+                                //eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                //@ts-ignore
+                                const tokenBody = JSON.parse(Buffer.from(accessToken?.split('.')[1], 'base64'))
+
+                                await this.tokenData.set({
+                                    expires_in: tokenBody['exp'],
+                                    access_token: accessToken,
+                                    refresh_token: refreshToken
+                                })
                             }
                         })
                     ]
@@ -569,11 +571,11 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
         }
     }
 
-    /*
-    async getRefreshToken(): Promise<void> {
+    async refreshAccessToken(): Promise<void> {
         try {
-            const refreshToken = await this.refreshToken.get()
-            //console.log(JSON.stringify(refreshToken, null, 2)) // Log request data
+            const tokenData = await this.tokenData.get()
+
+            //console.log(JSON.stringify(tokenData, null, 2)) // Log request data
 
             const response = await this.requestManager.schedule(App.createRequest({
                 url: 'https://myanimelist.net/v1/oauth2/token',
@@ -581,27 +583,34 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
                 headers: {
                     'content-type': 'application/x-www-form-urlencoded'
                 },
-                data: stringify({
+                data: {
                     grant_type: 'refresh_token',
-                    refresh_token: refreshToken,
+                    refresh_token: tokenData?.refresh_token,
                     client_id: '004e72f9c4d8f5e6e8737d320246c0e3'
-                })
+                }
             }), 1)
 
-            const tokenData = MalResult<MalToken.Data>(response)
-            if (tokenData.access_token == null) {
+            const newTokenData = MalResult<MalToken.Data>(response)
+            if (newTokenData.access_token == null) {
                 throw new Error('Unable to request new "access token", try logging out and back in!')
             }
-            if (tokenData.refresh_token == null) {
+            if (newTokenData.refresh_token == null) {
                 throw new Error('Unable to request new "refresh token", try logging out and back in!')
             }
 
-            await this.accessToken.set(tokenData.access_token)
-            await this.refreshToken.set(tokenData.refresh_token)
+            //eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            //@ts-ignore
+            const tokenBody = JSON.parse(Buffer.from(newTokenData.split('.')[1], 'base64'))
+
+            // Set the new token data
+            await this.tokenData.set({
+                expires_in: tokenBody['exp'],
+                access_token: newTokenData.access_token,
+                refresh_token: newTokenData.access_token
+            })
+
         } catch (error) {
             throw new Error(error as string)
         }
     }
-    */
-
 }
