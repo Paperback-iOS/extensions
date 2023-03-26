@@ -11,7 +11,4 @@ Paperback does not officially support other third party source extensions (exten
 ## Supported trackers
 
 - [AniList](https://anilist.co/)
-
-## To be supported trackers
-
 - [MyAnimeList](https://myanimelist.net/)
