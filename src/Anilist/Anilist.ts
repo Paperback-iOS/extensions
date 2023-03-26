@@ -31,8 +31,9 @@ import * as AnilistManga from './models/anilist-manga'
 import { AnilistResult } from './models/anilist-result'
 
 import {
-    getDefaultPrivate,
     getDefaultStatus,
+    getDefaultPrivate,
+    getDefaultHiddenFromStatusLists,
     trackerSettings
 } from './AlSettings'
 
@@ -43,7 +44,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.2',
+    version: '1.1.3',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -328,10 +329,10 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             })
                         ]
                     }),
-                    // Private
+                    // privacy
                     App.createDUISection({
-                        id: 'mangaPrivate',
-                        header: 'Private',
+                        id: 'privacy_settings',
+                        header: 'Privacy Settings',
                         isHidden: false,
                         rows: async () => [
                             App.createDUISwitch({
@@ -339,6 +340,12 @@ export class Anilist implements Searchable, MangaProgressProviding {
                                 label: 'Private',
                                 //@ts-ignore
                                 value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : (await getDefaultPrivate(this.stateManager))
+                            }),
+                            App.createDUISwitch({
+                                id: 'hiddenFromStatusLists',
+                                label: 'Hide from Status Lists',
+                                //@ts-ignore
+                                value: anilistManga.mediaListEntry?.hiddenFromStatusLists != undefined ? anilistManga.mediaListEntry.hiddenFromStatusLists : (await getDefaultHiddenFromStatusLists(this.stateManager))
                             })
                         ]
                     }),
@@ -376,6 +383,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                         progress: values['progress'],
                         progressVolumes: values['progressVolumes'],
                         private: values['private'],
+                        hiddenFromStatusLists: values['hiddenFromStatusLists'],
                         score: Number(values['score'])
                     })
                 }

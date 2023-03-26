@@ -52,6 +52,7 @@ export interface MediaListEntry {
     progress?: number;
     progressVolumes?: number;
     private?: boolean;
+    hiddenFromStatusLists?: boolean;
     score?: number;
     notes?: null;
     advancedScores?: AdvancedScores;
