@@ -311,7 +311,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                             }),
                             App.createDUIStepper({
                                 id: 'repeat',
-                                label: 'Re-Reads',
+                                label: 'Times Re-Read',
                                 //@ts-ignore
                                 value: anilistManga.mediaListEntry?.repeat != undefined ? anilistManga.mediaListEntry?.repeat: 0,
                                 min: 0,
