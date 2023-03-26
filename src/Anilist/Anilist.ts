@@ -347,13 +347,13 @@ export class Anilist implements Searchable, MangaProgressProviding {
                                 id: 'private',
                                 label: 'Private',
                                 //@ts-ignore
-                                value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : (await getDefaultPrivate(this.stateManager))
+                                value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : ((await getDefaultPrivate(this.stateManager) == 'ADULTONLY' && anilistManga.isAdult || await getDefaultPrivate(this.stateManager) == 'ALWAYS') ? true : false)
                             }),
                             App.createDUISwitch({
                                 id: 'hiddenFromStatusLists',
                                 label: 'Hide from Status Lists',
                                 //@ts-ignore
-                                value: anilistManga.mediaListEntry?.hiddenFromStatusLists != undefined ? anilistManga.mediaListEntry.hiddenFromStatusLists : (await getDefaultHiddenFromStatusLists(this.stateManager))
+                                value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : ((await getDefaultHiddenFromStatusLists(this.stateManager) == 'ADULTONLY' && anilistManga.isAdult || await getDefaultHiddenFromStatusLists(this.stateManager) == 'ALWAYS') ? true : false)
                             })
                         ]
                     }),

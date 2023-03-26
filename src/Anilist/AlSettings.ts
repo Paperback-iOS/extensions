@@ -6,11 +6,11 @@ import {
 export const getDefaultStatus = async (stateManager: SourceStateManager): Promise<string[]> => {
     return (await stateManager.retrieve('defaultStatus') as string[]) ?? ['NONE']
 }
-export const getDefaultPrivate = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('defaultPrivate') as boolean | undefined) ?? false
+export const getDefaultPrivate = async (stateManager: SourceStateManager): Promise<string[]> => {
+    return (await stateManager.retrieve('defaultPrivate') as string[]) ?? ['NEVER']
 }
-export const getDefaultHiddenFromStatusLists = async (stateManager: SourceStateManager): Promise<boolean> => {
-    return (await stateManager.retrieve('defaultHiddenFromStatusLists') as boolean | undefined) ?? false
+export const getDefaultHiddenFromStatusLists = async (stateManager: SourceStateManager): Promise<string[]> => {
+    return (await stateManager.retrieve('defaultHiddenFromStatusLists') as string[]) ?? ['NEVER']
 }
 
 export const trackerSettings = (stateManager: SourceStateManager): DUINavigationButton => {
@@ -61,21 +61,47 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
                         header: 'Privacy Settings',
                         isHidden: false,
                         rows: async () => [
-                            App.createDUISwitch({
+                            App.createDUISelect({
                                 id: 'defaultPrivate',
                                 label: 'Private by Default',
+                                allowsMultiselect: false,
                                 value: App.createDUIBinding({
                                     get: () => getDefaultPrivate(stateManager),
                                     set: async (newValue) => await stateManager.store('defaultPrivate', newValue)
-                                })
+                                }),
+                                labelResolver: async (value) => {
+                                    switch (value) {
+                                        case 'ALWAYS': return 'Always'
+                                        case 'ADULTONLY': return 'Only for Adult Content'
+                                        default: return 'Never'
+                                    }
+                                },
+                                options: [
+                                    'NEVER',
+                                    'ADULTONLY',
+                                    'ALWAYS'
+                                ]
                             }),
-                            App.createDUISwitch({
+                            App.createDUISelect({
                                 id: 'defaultHiddenFromStatusLists',
-                                label: 'Hidden from Status Lists by Default',
+                                label: 'Hide from Status Lists by Default',
+                                allowsMultiselect: false,
                                 value: App.createDUIBinding({
                                     get: () => getDefaultHiddenFromStatusLists(stateManager),
                                     set: async (newValue) => await stateManager.store('defaultHiddenFromStatusLists', newValue)
-                                })
+                                }),
+                                labelResolver: async (value) => {
+                                    switch (value) {
+                                        case 'ALWAYS': return 'Always'
+                                        case 'ADULTONLY': return 'Only for Adult Content'
+                                        default: return 'Never'
+                                    }
+                                },
+                                options: [
+                                    'NEVER',
+                                    'ADULTONLY',
+                                    'ALWAYS'
+                                ]
                             })
                         ]
                     })
