@@ -33,7 +33,7 @@ import { AnilistResult } from './models/anilist-result'
 import {
     getDefaultStatus,
     getDefaultPrivate,
-    getDefaultHiddenFromStatusLists,
+    getDefaultHideFromActivity,
     trackerSettings
 } from './AlSettings'
 
@@ -350,10 +350,10 @@ export class Anilist implements Searchable, MangaProgressProviding {
                                 value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : ((await getDefaultPrivate(this.stateManager) == 'ADULTONLY' && anilistManga.isAdult || await getDefaultPrivate(this.stateManager) == 'ALWAYS') ? true : false)
                             }),
                             App.createDUISwitch({
-                                id: 'hiddenFromStatusLists',
-                                label: 'Hide from Status Lists',
+                                id: 'hideFromActivity',
+                                label: 'Hide From Activity',
                                 //@ts-ignore
-                                value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : ((await getDefaultHiddenFromStatusLists(this.stateManager) == 'ADULTONLY' && anilistManga.isAdult || await getDefaultHiddenFromStatusLists(this.stateManager) == 'ALWAYS') ? true : false)
+                                value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : ((await getDefaultHideFromActivity(this.stateManager) == 'ADULTONLY' && anilistManga.isAdult || await getDefaultHideFromActivity(this.stateManager) == 'ALWAYS') ? true : false)
                             })
                         ]
                     }),
@@ -392,7 +392,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                         progressVolumes: values['progressVolumes'],
                         repeat: values['repeat'],
                         private: values['private'],
-                        hiddenFromStatusLists: values['hiddenFromStatusLists'],
+                        hiddenFromStatusLists: values['hideFromActivity'],
                         score: Number(values['score'])
                     })
                 }

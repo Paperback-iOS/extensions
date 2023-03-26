@@ -9,8 +9,8 @@ export const getDefaultStatus = async (stateManager: SourceStateManager): Promis
 export const getDefaultPrivate = async (stateManager: SourceStateManager): Promise<string[]> => {
     return (await stateManager.retrieve('defaultPrivate') as string[]) ?? ['NEVER']
 }
-export const getDefaultHiddenFromStatusLists = async (stateManager: SourceStateManager): Promise<string[]> => {
-    return (await stateManager.retrieve('defaultHiddenFromStatusLists') as string[]) ?? ['NEVER']
+export const getDefaultHideFromActivity = async (stateManager: SourceStateManager): Promise<string[]> => {
+    return (await stateManager.retrieve('defaultHideFromActivity') as string[]) ?? ['NEVER']
 }
 
 export const trackerSettings = (stateManager: SourceStateManager): DUINavigationButton => {
@@ -72,7 +72,7 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
                                 labelResolver: async (value) => {
                                     switch (value) {
                                         case 'ALWAYS': return 'Always'
-                                        case 'ADULTONLY': return 'Only for Adult Content'
+                                        case 'ADULTONLY': return 'Adult Only'
                                         default: return 'Never'
                                     }
                                 },
@@ -83,17 +83,17 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
                                 ]
                             }),
                             App.createDUISelect({
-                                id: 'defaultHiddenFromStatusLists',
-                                label: 'Hide from Status Lists by Default',
+                                id: 'defaultHideFromActivity',
+                                label: 'Hide from Activity by Default',
                                 allowsMultiselect: false,
                                 value: App.createDUIBinding({
-                                    get: () => getDefaultHiddenFromStatusLists(stateManager),
-                                    set: async (newValue) => await stateManager.store('defaultHiddenFromStatusLists', newValue)
+                                    get: () => getDefaultHideFromActivity(stateManager),
+                                    set: async (newValue) => await stateManager.store('defaultHideFromActivity', newValue)
                                 }),
                                 labelResolver: async (value) => {
                                     switch (value) {
                                         case 'ALWAYS': return 'Always'
-                                        case 'ADULTONLY': return 'Only for Adult Content'
+                                        case 'ADULTONLY': return 'Adult Only'
                                         default: return 'Never'
                                     }
                                 },
