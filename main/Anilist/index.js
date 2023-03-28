@@ -459,7 +459,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.trackerSettings = exports.getDefaultHiddenFromStatusLists = exports.getDefaultPrivate = exports.getDefaultStatus = void 0;
+exports.trackerSettings = exports.getDefaultHideFromActivity = exports.getDefaultPrivate = exports.getDefaultStatus = void 0;
 const getDefaultStatus = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     return (_a = (yield stateManager.retrieve('defaultStatus'))) !== null && _a !== void 0 ? _a : ['NONE'];
@@ -467,14 +467,14 @@ const getDefaultStatus = (stateManager) => __awaiter(void 0, void 0, void 0, fun
 exports.getDefaultStatus = getDefaultStatus;
 const getDefaultPrivate = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;
-    return (_b = (yield stateManager.retrieve('defaultPrivate'))) !== null && _b !== void 0 ? _b : false;
+    return (_b = (yield stateManager.retrieve('defaultPrivate'))) !== null && _b !== void 0 ? _b : ['NEVER'];
 });
 exports.getDefaultPrivate = getDefaultPrivate;
-const getDefaultHiddenFromStatusLists = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
+const getDefaultHideFromActivity = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
     var _c;
-    return (_c = (yield stateManager.retrieve('defaultHiddenFromStatusLists'))) !== null && _c !== void 0 ? _c : false;
+    return (_c = (yield stateManager.retrieve('defaultHideFromActivity'))) !== null && _c !== void 0 ? _c : ['NEVER'];
 });
-exports.getDefaultHiddenFromStatusLists = getDefaultHiddenFromStatusLists;
+exports.getDefaultHideFromActivity = getDefaultHideFromActivity;
 const trackerSettings = (stateManager) => {
     return App.createDUINavigationButton({
         id: 'tracker_settings',
@@ -526,21 +526,47 @@ const trackerSettings = (stateManager) => {
                         isHidden: false,
                         rows: () => __awaiter(void 0, void 0, void 0, function* () {
                             return [
-                                App.createDUISwitch({
+                                App.createDUISelect({
                                     id: 'defaultPrivate',
                                     label: 'Private by Default',
+                                    allowsMultiselect: false,
                                     value: App.createDUIBinding({
                                         get: () => (0, exports.getDefaultPrivate)(stateManager),
                                         set: (newValue) => __awaiter(void 0, void 0, void 0, function* () { return yield stateManager.store('defaultPrivate', newValue); })
-                                    })
+                                    }),
+                                    labelResolver: (value) => __awaiter(void 0, void 0, void 0, function* () {
+                                        switch (value) {
+                                            case 'ALWAYS': return 'Always';
+                                            case 'ADULTONLY': return 'Adult Only';
+                                            default: return 'Never';
+                                        }
+                                    }),
+                                    options: [
+                                        'NEVER',
+                                        'ADULTONLY',
+                                        'ALWAYS'
+                                    ]
                                 }),
-                                App.createDUISwitch({
-                                    id: 'defaultHiddenFromStatusLists',
-                                    label: 'Hidden from Status Lists by Default',
+                                App.createDUISelect({
+                                    id: 'defaultHideFromActivity',
+                                    label: 'Hide from Activity by Default',
+                                    allowsMultiselect: false,
                                     value: App.createDUIBinding({
-                                        get: () => (0, exports.getDefaultHiddenFromStatusLists)(stateManager),
-                                        set: (newValue) => __awaiter(void 0, void 0, void 0, function* () { return yield stateManager.store('defaultHiddenFromStatusLists', newValue); })
-                                    })
+                                        get: () => (0, exports.getDefaultHideFromActivity)(stateManager),
+                                        set: (newValue) => __awaiter(void 0, void 0, void 0, function* () { return yield stateManager.store('defaultHideFromActivity', newValue); })
+                                    }),
+                                    labelResolver: (value) => __awaiter(void 0, void 0, void 0, function* () {
+                                        switch (value) {
+                                            case 'ALWAYS': return 'Always';
+                                            case 'ADULTONLY': return 'Adult Only';
+                                            default: return 'Never';
+                                        }
+                                    }),
+                                    options: [
+                                        'NEVER',
+                                        'ADULTONLY',
+                                        'ALWAYS'
+                                    ]
                                 })
                             ];
                         })
@@ -575,7 +601,7 @@ exports.AnilistInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: types_1.ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.3',
+    version: '1.1.4',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: types_1.SourceIntents.MANGA_TRACKING | types_1.SourceIntents.SETTINGS_UI
@@ -827,7 +853,7 @@ class Anilist {
                             header: 'Progress',
                             isHidden: false,
                             rows: () => __awaiter(this, void 0, void 0, function* () {
-                                var _q, _r, _s, _t;
+                                var _q, _r, _s, _t, _u, _v;
                                 return [
                                     App.createDUIStepper({
                                         id: 'progress',
@@ -844,7 +870,15 @@ class Anilist {
                                         value: (_t = (_s = anilistManga.mediaListEntry) === null || _s === void 0 ? void 0 : _s.progressVolumes) !== null && _t !== void 0 ? _t : 0,
                                         min: 0,
                                         step: 1
-                                    })
+                                    }),
+                                    App.createDUIStepper({
+                                        id: 'repeat',
+                                        label: 'Times Re-Read',
+                                        //@ts-ignore
+                                        value: ((_u = anilistManga.mediaListEntry) === null || _u === void 0 ? void 0 : _u.repeat) != undefined ? (_v = anilistManga.mediaListEntry) === null || _v === void 0 ? void 0 : _v.repeat : 0,
+                                        min: 0,
+                                        step: 1
+                                    }),
                                 ];
                             })
                         }),
@@ -855,16 +889,16 @@ class Anilist {
                             footer: 'This uses your rating preference set on AniList',
                             isHidden: false,
                             rows: () => __awaiter(this, void 0, void 0, function* () {
-                                var _u, _v, _w, _x, _y, _z;
+                                var _w, _x, _y, _z, _0, _1;
                                 return [
                                     App.createDUIStepper({
                                         id: 'score',
                                         label: 'Score',
                                         //@ts-ignore
-                                        value: (_v = (_u = anilistManga.mediaListEntry) === null || _u === void 0 ? void 0 : _u.score) !== null && _v !== void 0 ? _v : 0,
+                                        value: (_x = (_w = anilistManga.mediaListEntry) === null || _w === void 0 ? void 0 : _w.score) !== null && _x !== void 0 ? _x : 0,
                                         min: 0,
-                                        max: this.scoreFormatLimit((_x = (_w = user.mediaListOptions) === null || _w === void 0 ? void 0 : _w.scoreFormat) !== null && _x !== void 0 ? _x : 'POINT_10'),
-                                        step: ((_z = (_y = user.mediaListOptions) === null || _y === void 0 ? void 0 : _y.scoreFormat) === null || _z === void 0 ? void 0 : _z.includes('DECIMAL')) === true ? 0.1 : 1
+                                        max: this.scoreFormatLimit((_z = (_y = user.mediaListOptions) === null || _y === void 0 ? void 0 : _y.scoreFormat) !== null && _z !== void 0 ? _z : 'POINT_10'),
+                                        step: ((_1 = (_0 = user.mediaListOptions) === null || _0 === void 0 ? void 0 : _0.scoreFormat) === null || _1 === void 0 ? void 0 : _1.includes('DECIMAL')) === true ? 0.1 : 1
                                     })
                                 ];
                             })
@@ -875,19 +909,19 @@ class Anilist {
                             header: 'Privacy Settings',
                             isHidden: false,
                             rows: () => __awaiter(this, void 0, void 0, function* () {
-                                var _0, _1;
+                                var _2, _3;
                                 return [
                                     App.createDUISwitch({
                                         id: 'private',
                                         label: 'Private',
                                         //@ts-ignore
-                                        value: ((_0 = anilistManga.mediaListEntry) === null || _0 === void 0 ? void 0 : _0.private) != undefined ? anilistManga.mediaListEntry.private : (yield (0, AlSettings_1.getDefaultPrivate)(this.stateManager))
+                                        value: ((_2 = anilistManga.mediaListEntry) === null || _2 === void 0 ? void 0 : _2.private) != undefined ? anilistManga.mediaListEntry.private : (((yield (0, AlSettings_1.getDefaultPrivate)(this.stateManager)) == 'ADULTONLY' && anilistManga.isAdult || (yield (0, AlSettings_1.getDefaultPrivate)(this.stateManager)) == 'ALWAYS') ? true : false)
                                     }),
                                     App.createDUISwitch({
-                                        id: 'hiddenFromStatusLists',
-                                        label: 'Hide from Status Lists',
+                                        id: 'hideFromActivity',
+                                        label: 'Hide From Activity',
                                         //@ts-ignore
-                                        value: ((_1 = anilistManga.mediaListEntry) === null || _1 === void 0 ? void 0 : _1.hiddenFromStatusLists) != undefined ? anilistManga.mediaListEntry.hiddenFromStatusLists : (yield (0, AlSettings_1.getDefaultHiddenFromStatusLists)(this.stateManager))
+                                        value: ((_3 = anilistManga.mediaListEntry) === null || _3 === void 0 ? void 0 : _3.private) != undefined ? anilistManga.mediaListEntry.private : (((yield (0, AlSettings_1.getDefaultHideFromActivity)(this.stateManager)) == 'ADULTONLY' && anilistManga.isAdult || (yield (0, AlSettings_1.getDefaultHideFromActivity)(this.stateManager)) == 'ALWAYS') ? true : false)
                                     })
                                 ];
                             })
@@ -898,13 +932,13 @@ class Anilist {
                             header: 'Notes',
                             isHidden: false,
                             rows: () => __awaiter(this, void 0, void 0, function* () {
-                                var _2, _3;
+                                var _4, _5;
                                 return [
                                     App.createDUIInputField({
                                         id: 'notes',
                                         label: 'Notes',
                                         //@ts-ignore
-                                        value: (_3 = (_2 = anilistManga.mediaListEntry) === null || _2 === void 0 ? void 0 : _2.notes) !== null && _3 !== void 0 ? _3 : ''
+                                        value: (_5 = (_4 = anilistManga.mediaListEntry) === null || _4 === void 0 ? void 0 : _4.notes) !== null && _5 !== void 0 ? _5 : ''
                                     })
                                 ];
                             })
@@ -912,9 +946,9 @@ class Anilist {
                     ];
                 }),
                 onSubmit: (values) => __awaiter(this, void 0, void 0, function* () {
-                    var _4, _5;
+                    var _6, _7;
                     let mutation;
-                    const status = (_5 = (_4 = values['status']) === null || _4 === void 0 ? void 0 : _4[0]) !== null && _5 !== void 0 ? _5 : '';
+                    const status = (_7 = (_6 = values['status']) === null || _6 === void 0 ? void 0 : _6[0]) !== null && _7 !== void 0 ? _7 : '';
                     const id = tempData.id ? Number(tempData.id) : undefined; //values['id'] != null ? Number(values['id']) : undefined
                     const mediaId = Number(tempData.mediaId); //Number(values['mediaId'])
                     if (status == 'NONE' && id != null) {
@@ -928,8 +962,9 @@ class Anilist {
                             notes: values['notes'],
                             progress: values['progress'],
                             progressVolumes: values['progressVolumes'],
+                            repeat: values['repeat'],
                             private: values['private'],
-                            hiddenFromStatusLists: values['hiddenFromStatusLists'],
+                            hiddenFromStatusLists: values['hideFromActivity'],
                             score: Number(values['score'])
                         });
                     }
@@ -1211,11 +1246,11 @@ const getMangaProgressQuery = (id) => ({
                 status
                 progress
                 progressVolumes
+                repeat
                 private
                 hiddenFromStatusLists
                 score
                 notes
-                advancedScores
             }
             title {
                 romaji
@@ -1239,8 +1274,8 @@ const getMangaProgressQuery = (id) => ({
 });
 exports.getMangaProgressQuery = getMangaProgressQuery;
 const saveMangaProgressMutation = (variables) => ({
-    query: `mutation($id: Int, $mediaId: Int, $status: MediaListStatus, $score: Float, $progress: Int, $progressVolumes: Int, $notes: String, $private: Boolean, $hiddenFromStatusLists: Boolean) {
-        SaveMediaListEntry(id: $id, mediaId: $mediaId, status: $status, score: $score, progress: $progress, progressVolumes: $progressVolumes, notes: $notes, private: $private, hiddenFromStatusLists: $hiddenFromStatusLists){
+    query: `mutation($id: Int, $mediaId: Int, $status: MediaListStatus, $score: Float, $progress: Int, $progressVolumes: Int, $repeat: Int, $notes: String, $private: Boolean, $hiddenFromStatusLists: Boolean) {
+        SaveMediaListEntry(id: $id, mediaId: $mediaId, status: $status, score: $score, progress: $progress, progressVolumes: $progressVolumes, repeat: $repeat, notes: $notes, private: $private, hiddenFromStatusLists: $hiddenFromStatusLists){
             id
         }
     }`,
