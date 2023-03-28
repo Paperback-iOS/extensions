@@ -51,19 +51,11 @@ export interface MediaListEntry {
     status?: string;
     progress?: number;
     progressVolumes?: number;
+    repeat?: number;
     private?: boolean;
     hiddenFromStatusLists?: boolean;
     score?: number;
     notes?: null;
-    advancedScores?: AdvancedScores;
-}
-
-export interface AdvancedScores {
-    Story?: number;
-    Characters?: number;
-    Visuals?: number;
-    Audio?: number;
-    Enjoyment?: number;
 }
 
 export interface Staff {

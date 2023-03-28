@@ -15,7 +15,6 @@ export interface Avatar {
 }
 
 export interface MediaListOptions {
-    mangaList?: MangaList;
     scoreFormat?: ScoreFormat;
 }
 
@@ -24,10 +23,6 @@ export type ScoreFormat = 'POINT_100'
 | 'POINT_10'
 | 'POINT_5'
 | 'POINT_3'
-
-export interface MangaList {
-    advancedScoringEnabled?: boolean;
-}
 
 export interface Options {
     displayAdultContent?: boolean;

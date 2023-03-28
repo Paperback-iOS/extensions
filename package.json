@@ -1,12 +1,14 @@
 {
   "name": "extensions",
-  "version": "1.1.2",
+  "version": "1.0.0",
+  "repositoryName": "Default extensions",
   "description": "Default extensions for Paperback 0.8.",
   "main": "lib/index.js",
   "scripts": {
     "migrate": "npx paperback migrate",
     "bundle": "npx paperback bundle",
-    "serve": "npx paperback serve"
+    "serve": "npx paperback serve",
+    "dev": "npx nodemon --watch \"**/*.ts\" --ext \"js ts\" --exec \"npm run serve\""
   },
   "repository": {
     "type": "git",
