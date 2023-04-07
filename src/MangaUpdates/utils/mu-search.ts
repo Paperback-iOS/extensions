@@ -1,4 +1,5 @@
 import type { MUSeriesSearchResponseV1 } from '../models/mu-api'
+import { sanitiseString } from './mu-manga'
 
 type ApiResult = Exclude<MUSeriesSearchResponseV1['results'], undefined>[0]
 
@@ -19,6 +20,11 @@ export function parseSearchResults(results: ApiResult[]): ResultInfo[] {
             return null
         }
 
-        return { mangaId: String(id), title, image }
-    }) .filter((info): info is ResultInfo => info !== null)
+        return {
+            mangaId: String(id),
+            title: sanitiseString(title),
+            image,
+        }
+    })
+        .filter((info): info is ResultInfo => info !== null)
 }

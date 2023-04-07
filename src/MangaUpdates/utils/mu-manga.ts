@@ -2,6 +2,21 @@ import type { MUSeriesModelV1 } from '../models/mu-api'
 
 export type MangaInfoInput = Parameters<typeof App.createMangaInfo>[0]
 
+const HTML_ENTITIES = {
+    '&nbsp;': ' ',
+    '&cent;': '¢',
+    '&pound;': '£',
+    '&yen;': '¥',
+    '&euro;': '€',
+    '&copy;': '©',
+    '&reg;': '®',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&amp;': '&',
+    '&apos;': '\'',
+}
+
 const IS_HENTAI_GENRE: Record<string, boolean> = {
     Adult: true,
     Hentai: true,
@@ -54,12 +69,37 @@ function isHentai(manga: MUSeriesModelV1): boolean {
     return manga.genres?.some((genre) => IS_HENTAI_GENRE[genre?.genre || '']) || false
 }
 
+export function sanitiseString(str: string): string {
+    return str
+        .replace(/&[^;]+;/g, (entity) => {
+            if (entity in HTML_ENTITIES) {
+                return HTML_ENTITIES[entity as keyof typeof HTML_ENTITIES]
+            }
+
+            const hexMatch = entity.match(/^&#x([\da-fA-F]+);$/)
+            const hexCode = hexMatch != null ? hexMatch[1] : undefined
+            if (hexCode != null) {
+                return String.fromCharCode(parseInt(hexCode, 16))
+            }
+
+            const decimalMatch = entity.match(/^&#(\d+);$/)
+            const decimalCode = decimalMatch != null ? decimalMatch[1] : undefined
+            if (decimalCode != null) {
+                return String.fromCharCode(parseInt(decimalCode, 10))
+            }
+
+            return entity
+        })
+        .replace(/<br>/gi, '\n')
+        .replace(/<\/?(i|u|b|em|a|span|div|!--)[^>]*>/gi, '')
+}
+
 export function parseMangaInfo(series: MUSeriesModelV1): MangaInfoInput {
     return {
-        titles: [series.title, ...(series.associated || []).map((associated) => associated?.title)].filter(
-            (title): title is string => !!title,
-        ),
-        desc: series.description || '',
+        titles: [series.title, ...(series.associated || []).map((associated) => associated?.title)]
+            .filter((title): title is string => !!title)
+            .map(sanitiseString),
+        desc: sanitiseString(series.description || ''),
         image: series.image?.url?.original || '',
         author:
             series.authors
