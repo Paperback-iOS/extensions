@@ -33,7 +33,7 @@ import { AnilistResult } from './models/anilist-result'
 import {
     getDefaultStatus,
     getDefaultPrivate,
-    getDefaultHiddenFromStatusLists,
+    getDefaultHideFromActivity,
     trackerSettings
 } from './AlSettings'
 
@@ -44,7 +44,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.3',
+    version: '1.1.4',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -308,7 +308,15 @@ export class Anilist implements Searchable, MangaProgressProviding {
                                 value: anilistManga.mediaListEntry?.progressVolumes ?? 0,
                                 min: 0,
                                 step: 1
-                            })
+                            }),
+                            App.createDUIStepper({
+                                id: 'repeat',
+                                label: 'Times Re-Read',
+                                //@ts-ignore
+                                value: anilistManga.mediaListEntry?.repeat != undefined ? anilistManga.mediaListEntry?.repeat: 0,
+                                min: 0,
+                                step: 1
+                            }),
                         ]
                     }),
                     // Rating
@@ -339,13 +347,13 @@ export class Anilist implements Searchable, MangaProgressProviding {
                                 id: 'private',
                                 label: 'Private',
                                 //@ts-ignore
-                                value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : (await getDefaultPrivate(this.stateManager))
+                                value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : ((await getDefaultPrivate(this.stateManager) == 'ADULTONLY' && anilistManga.isAdult || await getDefaultPrivate(this.stateManager) == 'ALWAYS') ? true : false)
                             }),
                             App.createDUISwitch({
-                                id: 'hiddenFromStatusLists',
-                                label: 'Hide from Status Lists',
+                                id: 'hideFromActivity',
+                                label: 'Hide From Activity',
                                 //@ts-ignore
-                                value: anilistManga.mediaListEntry?.hiddenFromStatusLists != undefined ? anilistManga.mediaListEntry.hiddenFromStatusLists : (await getDefaultHiddenFromStatusLists(this.stateManager))
+                                value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : ((await getDefaultHideFromActivity(this.stateManager) == 'ADULTONLY' && anilistManga.isAdult || await getDefaultHideFromActivity(this.stateManager) == 'ALWAYS') ? true : false)
                             })
                         ]
                     }),
@@ -382,8 +390,9 @@ export class Anilist implements Searchable, MangaProgressProviding {
                         notes: values['notes'],
                         progress: values['progress'],
                         progressVolumes: values['progressVolumes'],
+                        repeat: values['repeat'],
                         private: values['private'],
-                        hiddenFromStatusLists: values['hiddenFromStatusLists'],
+                        hiddenFromStatusLists: values['hideFromActivity'],
                         score: Number(values['score'])
                     })
                 }
