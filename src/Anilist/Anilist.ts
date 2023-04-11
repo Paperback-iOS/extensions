@@ -44,7 +44,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.4',
+    version: '1.1.5',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -313,7 +313,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                                 id: 'repeat',
                                 label: 'Times Re-Read',
                                 //@ts-ignore
-                                value: anilistManga.mediaListEntry?.repeat != undefined ? anilistManga.mediaListEntry?.repeat: 0,
+                                value: anilistManga.mediaListEntry?.repeat != undefined ? anilistManga.mediaListEntry?.repeat : 0,
                                 min: 0,
                                 step: 1
                             }),
@@ -491,10 +491,37 @@ export class Anilist implements Searchable, MangaProgressProviding {
 
         const chapterReadActions = await actionQueue.queuedChapterReadActions()
 
-        for (const readAction of chapterReadActions) {
-            try {
-                let params = {}
+        type PartialMediaListEntry = { mediaListEntry?: { progress?: number, progressVolumes?: number } }
+        const anilistMangaCache: Record<string, PartialMediaListEntry | undefined> = {}
 
+        for (const readAction of chapterReadActions) {
+
+            try {
+                let anilistManga = anilistMangaCache[readAction.mangaId]
+
+                if (!anilistManga) {
+                    const _response = await this.requestManager.schedule(App.createRequest({
+                        url: ANILIST_GRAPHQL_ENDPOINT,
+                        method: 'POST',
+                        data: getMangaProgressQuery(parseInt(readAction.mangaId))
+                    }), 0)
+
+                    anilistManga = AnilistResult<AnilistManga.Result>(_response.data).data?.Media
+                    anilistMangaCache[readAction.mangaId] = anilistManga
+                }
+
+                if (anilistManga?.mediaListEntry) {
+                    // If the Anilist volume is higher than progresss, skip
+                    if (anilistManga.mediaListEntry.progressVolumes && anilistManga.mediaListEntry.progressVolumes > Math.floor(readAction.volumeNumber)) {
+                        continue
+                    }
+                    // If the Anilist volume is the same as progress but Anilist chapter is higher or equal, skip
+                    if (anilistManga.mediaListEntry.progress && anilistManga.mediaListEntry.progressVolumes == Math.floor(readAction.volumeNumber) && anilistManga.mediaListEntry.progress >= Math.floor(readAction.chapterNumber)) {
+                        continue
+                    }
+                }
+
+                let params = {}
                 if (Math.floor(readAction.chapterNumber) == 1 && !readAction.volumeNumber) {
                     params = {
                         mediaId: readAction.mangaId,
@@ -517,6 +544,12 @@ export class Anilist implements Searchable, MangaProgressProviding {
 
                 if (response.status < 400) {
                     await actionQueue.discardChapterReadAction(readAction)
+                    anilistMangaCache[readAction.mangaId] = {
+                        mediaListEntry: {
+                            progress: Math.floor(readAction.chapterNumber),
+                            progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : undefined
+                        }
+                    }
                 } else {
                     console.log(`Action failed: ${response.data}`)
                     await actionQueue.retryChapterReadAction(readAction)
