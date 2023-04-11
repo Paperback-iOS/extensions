@@ -12,3 +12,4 @@ Paperback does not officially support other third party source extensions (exten
 
 - [AniList](https://anilist.co/)
 - [MyAnimeList](https://myanimelist.net/)
+- [MangaUpdates](https://mangaupdates.com/)
