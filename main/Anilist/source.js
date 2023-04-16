@@ -601,7 +601,7 @@ exports.AnilistInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: types_1.ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.4',
+    version: '1.1.5',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: types_1.SourceIntents.MANGA_TRACKING | types_1.SourceIntents.SETTINGS_UI
@@ -1060,11 +1060,33 @@ class Anilist {
         });
     }
     processChapterReadActionQueue(actionQueue) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             yield this.userInfo.refresh();
             const chapterReadActions = yield actionQueue.queuedChapterReadActions();
+            const anilistMangaCache = {};
             for (const readAction of chapterReadActions) {
                 try {
+                    let anilistManga = anilistMangaCache[readAction.mangaId];
+                    if (!anilistManga) {
+                        const _response = yield this.requestManager.schedule(App.createRequest({
+                            url: ANILIST_GRAPHQL_ENDPOINT,
+                            method: 'POST',
+                            data: (0, graphql_queries_1.getMangaProgressQuery)(parseInt(readAction.mangaId))
+                        }), 0);
+                        anilistManga = (_a = (0, anilist_result_1.AnilistResult)(_response.data).data) === null || _a === void 0 ? void 0 : _a.Media;
+                        anilistMangaCache[readAction.mangaId] = anilistManga;
+                    }
+                    if (anilistManga === null || anilistManga === void 0 ? void 0 : anilistManga.mediaListEntry) {
+                        // If the Anilist volume is higher than progresss, skip
+                        if (anilistManga.mediaListEntry.progressVolumes && anilistManga.mediaListEntry.progressVolumes > Math.floor(readAction.volumeNumber)) {
+                            continue;
+                        }
+                        // If the Anilist volume is the same as progress but Anilist chapter is higher or equal, skip
+                        if (anilistManga.mediaListEntry.progress && anilistManga.mediaListEntry.progressVolumes == Math.floor(readAction.volumeNumber) && anilistManga.mediaListEntry.progress >= Math.floor(readAction.chapterNumber)) {
+                            continue;
+                        }
+                    }
                     let params = {};
                     if (Math.floor(readAction.chapterNumber) == 1 && !readAction.volumeNumber) {
                         params = {
@@ -1087,6 +1109,12 @@ class Anilist {
                     }), 0);
                     if (response.status < 400) {
                         yield actionQueue.discardChapterReadAction(readAction);
+                        anilistMangaCache[readAction.mangaId] = {
+                            mediaListEntry: {
+                                progress: Math.floor(readAction.chapterNumber),
+                                progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : undefined
+                            }
+                        };
                     }
                     else {
                         console.log(`Action failed: ${response.data}`);
