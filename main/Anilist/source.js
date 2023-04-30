@@ -146,7 +146,7 @@ __exportStar(require("./SourceInfo"), exports);
 __exportStar(require("./HomeSectionType"), exports);
 __exportStar(require("./PaperbackExtensionBase"), exports);
 
-},{"./Badge":1,"./ByteArray":2,"./HomeSectionType":3,"./PaperbackExtensionBase":4,"./Source":5,"./SourceInfo":6,"./interfaces":13}],8:[function(require,module,exports){
+},{"./Badge":1,"./ByteArray":2,"./HomeSectionType":3,"./PaperbackExtensionBase":4,"./Source":5,"./SourceInfo":6,"./interfaces":15}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -168,6 +168,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 },{}],13:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],14:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],15:[function(require,module,exports){
+"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -184,20 +192,14 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./ChapterProviding"), exports);
-__exportStar(require("./Searchable"), exports);
-__exportStar(require("./Requestable"), exports);
-__exportStar(require("./MangaProviding"), exports);
+__exportStar(require("./CloudflareBypassRequestProviding"), exports);
+__exportStar(require("./HomePageSectionsProviding"), exports);
 __exportStar(require("./MangaProgressProviding"), exports);
+__exportStar(require("./MangaProviding"), exports);
+__exportStar(require("./RequestManagerProviding"), exports);
+__exportStar(require("./SearchResultsProviding"), exports);
 
-},{"./ChapterProviding":8,"./MangaProgressProviding":9,"./MangaProviding":10,"./Requestable":11,"./Searchable":12}],14:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],15:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],16:[function(require,module,exports){
+},{"./ChapterProviding":8,"./CloudflareBypassRequestProviding":9,"./HomePageSectionsProviding":10,"./MangaProgressProviding":11,"./MangaProviding":12,"./RequestManagerProviding":13,"./SearchResultsProviding":14}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -367,6 +369,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 },{}],58:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],59:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],60:[function(require,module,exports){
+"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -426,7 +436,7 @@ __exportStar(require("./Exports/TagSection"), exports);
 __exportStar(require("./Exports/TrackedMangaChapterReadAction"), exports);
 __exportStar(require("./Exports/TrackerActionQueue"), exports);
 
-},{"./DynamicUI/Exports/DUIBinding":15,"./DynamicUI/Exports/DUIForm":16,"./DynamicUI/Exports/DUIFormRow":17,"./DynamicUI/Exports/DUISection":18,"./DynamicUI/Rows/Exports/DUIButton":19,"./DynamicUI/Rows/Exports/DUIHeader":20,"./DynamicUI/Rows/Exports/DUIInputField":21,"./DynamicUI/Rows/Exports/DUILabel":22,"./DynamicUI/Rows/Exports/DUILink":23,"./DynamicUI/Rows/Exports/DUIMultilineLabel":24,"./DynamicUI/Rows/Exports/DUINavigationButton":25,"./DynamicUI/Rows/Exports/DUIOAuthButton":26,"./DynamicUI/Rows/Exports/DUISecureInputField":27,"./DynamicUI/Rows/Exports/DUISelect":28,"./DynamicUI/Rows/Exports/DUIStepper":29,"./DynamicUI/Rows/Exports/DUISwitch":30,"./Exports/Chapter":31,"./Exports/ChapterDetails":32,"./Exports/Cookie":33,"./Exports/HomeSection":34,"./Exports/IconText":35,"./Exports/MangaInfo":36,"./Exports/MangaProgress":37,"./Exports/MangaUpdates":38,"./Exports/PBCanvas":39,"./Exports/PBImage":40,"./Exports/PagedResults":41,"./Exports/PartialSourceManga":42,"./Exports/RawData":43,"./Exports/Request":44,"./Exports/RequestManager":45,"./Exports/Response":46,"./Exports/SearchField":47,"./Exports/SearchRequest":48,"./Exports/SecureStateManager":49,"./Exports/SourceCookieStore":50,"./Exports/SourceInterceptor":51,"./Exports/SourceManga":52,"./Exports/SourceStateManager":53,"./Exports/Tag":54,"./Exports/TagSection":55,"./Exports/TrackedMangaChapterReadAction":56,"./Exports/TrackerActionQueue":57}],59:[function(require,module,exports){
+},{"./DynamicUI/Exports/DUIBinding":17,"./DynamicUI/Exports/DUIForm":18,"./DynamicUI/Exports/DUIFormRow":19,"./DynamicUI/Exports/DUISection":20,"./DynamicUI/Rows/Exports/DUIButton":21,"./DynamicUI/Rows/Exports/DUIHeader":22,"./DynamicUI/Rows/Exports/DUIInputField":23,"./DynamicUI/Rows/Exports/DUILabel":24,"./DynamicUI/Rows/Exports/DUILink":25,"./DynamicUI/Rows/Exports/DUIMultilineLabel":26,"./DynamicUI/Rows/Exports/DUINavigationButton":27,"./DynamicUI/Rows/Exports/DUIOAuthButton":28,"./DynamicUI/Rows/Exports/DUISecureInputField":29,"./DynamicUI/Rows/Exports/DUISelect":30,"./DynamicUI/Rows/Exports/DUIStepper":31,"./DynamicUI/Rows/Exports/DUISwitch":32,"./Exports/Chapter":33,"./Exports/ChapterDetails":34,"./Exports/Cookie":35,"./Exports/HomeSection":36,"./Exports/IconText":37,"./Exports/MangaInfo":38,"./Exports/MangaProgress":39,"./Exports/MangaUpdates":40,"./Exports/PBCanvas":41,"./Exports/PBImage":42,"./Exports/PagedResults":43,"./Exports/PartialSourceManga":44,"./Exports/RawData":45,"./Exports/Request":46,"./Exports/RequestManager":47,"./Exports/Response":48,"./Exports/SearchField":49,"./Exports/SearchRequest":50,"./Exports/SecureStateManager":51,"./Exports/SourceCookieStore":52,"./Exports/SourceInterceptor":53,"./Exports/SourceManga":54,"./Exports/SourceStateManager":55,"./Exports/Tag":56,"./Exports/TagSection":57,"./Exports/TrackedMangaChapterReadAction":58,"./Exports/TrackerActionQueue":59}],61:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -447,7 +457,7 @@ __exportStar(require("./generated/_exports"), exports);
 __exportStar(require("./base/index"), exports);
 __exportStar(require("./compat/DyamicUI"), exports);
 
-},{"./base/index":7,"./compat/DyamicUI":14,"./generated/_exports":58}],60:[function(require,module,exports){
+},{"./base/index":7,"./compat/DyamicUI":16,"./generated/_exports":60}],62:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -459,7 +469,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.trackerSettings = exports.getDefaultHideFromActivity = exports.getDefaultPrivate = exports.getDefaultStatus = void 0;
+exports.trackerSettings = exports.getDefaultHideFromStatusLists = exports.getDefaultPrivate = exports.getDefaultStatus = void 0;
 const getDefaultStatus = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     return (_a = (yield stateManager.retrieve('defaultStatus'))) !== null && _a !== void 0 ? _a : ['NONE'];
@@ -470,11 +480,11 @@ const getDefaultPrivate = (stateManager) => __awaiter(void 0, void 0, void 0, fu
     return (_b = (yield stateManager.retrieve('defaultPrivate'))) !== null && _b !== void 0 ? _b : ['NEVER'];
 });
 exports.getDefaultPrivate = getDefaultPrivate;
-const getDefaultHideFromActivity = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
+const getDefaultHideFromStatusLists = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
     var _c;
     return (_c = (yield stateManager.retrieve('defaultHideFromActivity'))) !== null && _c !== void 0 ? _c : ['NEVER'];
 });
-exports.getDefaultHideFromActivity = getDefaultHideFromActivity;
+exports.getDefaultHideFromStatusLists = getDefaultHideFromStatusLists;
 const trackerSettings = (stateManager) => {
     return App.createDUINavigationButton({
         id: 'tracker_settings',
@@ -548,11 +558,11 @@ const trackerSettings = (stateManager) => {
                                     ]
                                 }),
                                 App.createDUISelect({
-                                    id: 'defaultHideFromActivity',
-                                    label: 'Hide from Activity by Default',
+                                    id: 'defaultHideFromStatusLists',
+                                    label: 'Hide from Status List by Default',
                                     allowsMultiselect: false,
                                     value: App.createDUIBinding({
-                                        get: () => (0, exports.getDefaultHideFromActivity)(stateManager),
+                                        get: () => (0, exports.getDefaultHideFromStatusLists)(stateManager),
                                         set: (newValue) => __awaiter(void 0, void 0, void 0, function* () { return yield stateManager.store('defaultHideFromActivity', newValue); })
                                     }),
                                     labelResolver: (value) => __awaiter(void 0, void 0, void 0, function* () {
@@ -578,7 +588,7 @@ const trackerSettings = (stateManager) => {
 };
 exports.trackerSettings = trackerSettings;
 
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -918,10 +928,10 @@ class Anilist {
                                         value: ((_2 = anilistManga.mediaListEntry) === null || _2 === void 0 ? void 0 : _2.private) != undefined ? anilistManga.mediaListEntry.private : (((yield (0, AlSettings_1.getDefaultPrivate)(this.stateManager)) == 'ADULTONLY' && anilistManga.isAdult || (yield (0, AlSettings_1.getDefaultPrivate)(this.stateManager)) == 'ALWAYS') ? true : false)
                                     }),
                                     App.createDUISwitch({
-                                        id: 'hideFromActivity',
-                                        label: 'Hide From Activity',
+                                        id: 'hiddenFromStatusLists',
+                                        label: 'Hide From Status List',
                                         //@ts-ignore
-                                        value: ((_3 = anilistManga.mediaListEntry) === null || _3 === void 0 ? void 0 : _3.private) != undefined ? anilistManga.mediaListEntry.private : (((yield (0, AlSettings_1.getDefaultHideFromActivity)(this.stateManager)) == 'ADULTONLY' && anilistManga.isAdult || (yield (0, AlSettings_1.getDefaultHideFromActivity)(this.stateManager)) == 'ALWAYS') ? true : false)
+                                        value: ((_3 = anilistManga.mediaListEntry) === null || _3 === void 0 ? void 0 : _3.hiddenFromStatusLists) != undefined ? anilistManga.mediaListEntry.hiddenFromStatusLists : (((yield (0, AlSettings_1.getDefaultHideFromStatusLists)(this.stateManager)) == 'ADULTONLY' && anilistManga.isAdult || (yield (0, AlSettings_1.getDefaultHideFromStatusLists)(this.stateManager)) == 'ALWAYS') ? true : false)
                                     })
                                 ];
                             })
@@ -964,7 +974,7 @@ class Anilist {
                             progressVolumes: values['progressVolumes'],
                             repeat: values['repeat'],
                             private: values['private'],
-                            hiddenFromStatusLists: values['hideFromActivity'],
+                            hiddenFromStatusLists: values['hiddenFromStatusLists'],
                             score: Number(values['score'])
                         });
                     }
@@ -1154,7 +1164,7 @@ class Anilist {
 }
 exports.Anilist = Anilist;
 
-},{"./AlSettings":60,"./models/anilist-result":62,"./models/graphql-queries":63,"@paperback/types":59}],62:[function(require,module,exports){
+},{"./AlSettings":62,"./models/anilist-result":64,"./models/graphql-queries":65,"@paperback/types":61}],64:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnilistResult = void 0;
@@ -1171,7 +1181,7 @@ function AnilistResult(json) {
 }
 exports.AnilistResult = AnilistResult;
 
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteMangaProgressMutation = exports.saveMangaProgressMutation = exports.getMangaProgressQuery = exports.getMangaQuery = exports.searchMangaQuery = exports.userProfileQuery = void 0;
@@ -1322,5 +1332,5 @@ const deleteMangaProgressMutation = (id) => ({
 });
 exports.deleteMangaProgressMutation = deleteMangaProgressMutation;
 
-},{}]},{},[61])(61)
+},{}]},{},[63])(63)
 });
