@@ -511,12 +511,8 @@ export class Anilist implements Searchable, MangaProgressProviding {
                 }
 
                 if (anilistManga?.mediaListEntry) {
-                    // If the Anilist volume is higher than progresss, skip
-                    if (anilistManga.mediaListEntry.progressVolumes && anilistManga.mediaListEntry.progressVolumes > Math.floor(readAction.volumeNumber)) {
-                        continue
-                    }
-                    // If the Anilist volume is the same as progress but Anilist chapter is higher or equal, skip
-                    if (anilistManga.mediaListEntry.progress && anilistManga.mediaListEntry.progressVolumes == Math.floor(readAction.volumeNumber) && anilistManga.mediaListEntry.progress >= Math.floor(readAction.chapterNumber)) {
+                    // If the Anilist chapter is higher or equal, skip
+                    if (anilistManga.mediaListEntry.progress && anilistManga.mediaListEntry.progress >= Math.floor(readAction.chapterNumber)) {
                         continue
                     }
                 }
