@@ -35,7 +35,7 @@ export const MyAnimeListInfo: SourceInfo = {
     author: 'Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.0.0',
+    version: '1.0.1',
     description: 'MyAnimeList Tracker',
     websiteBaseURL: 'https://myanimelist.net',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -117,7 +117,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
         const pageURL = metadata as string
 
         const response = await this.requestManager.schedule(App.createRequest({
-            url: pageURL ?? `${MYANIMELIST_API}/manga?q=${encodeURI(query.title ?? '')}`,
+            url: pageURL ?? `${MYANIMELIST_API}/manga?q=${encodeURI(query.title ?? '')}&nsfw=true`,
             method: 'GET'
         }), 1)
 
@@ -143,7 +143,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
 
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const response = await this.requestManager.schedule(App.createRequest({
-            url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=id,title,main_picture,alternative_titles,synopsis,mean,rank,popularity,nsfw,media_type,status,my_list_status,num_volumes,num_chapters,authors{first_name,last_name}`),
+            url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=id,title,main_picture,alternative_titles,synopsis,mean,rank,popularity,nsfw,media_type,status,my_list_status,num_volumes,num_chapters,authors{first_name,last_name}&nsfw=true`),
             method: 'GET'
         }), 1)
 
@@ -178,7 +178,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
 
     async getMangaProgress(mangaId: string): Promise<MangaProgress | undefined> {
         const response = await this.requestManager.schedule(App.createRequest({
-            url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=my_list_status`),
+            url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=my_list_status&nsfw=true`),
             method: 'GET'
         }), 1)
 
@@ -204,7 +204,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
             sections: async () => {
                 const [response] = await Promise.all([
                     this.requestManager.schedule(App.createRequest({
-                        url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=id,title,main_picture,alternative_titles,synopsis,mean,rank,popularity,nsfw,media_type,status,my_list_status,num_volumes,num_chapters,authors{first_name,last_name}`),
+                        url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=id,title,main_picture,alternative_titles,synopsis,mean,rank,popularity,nsfw,media_type,status,my_list_status,num_volumes,num_chapters,authors{first_name,last_name}&nsfw=true`),
                         method: 'GET'
                     }), 1),
 
@@ -398,7 +398,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
 
                 if (status == 'NONE' && mangaId != null) {
                     await this.requestManager.schedule(App.createRequest({
-                        url: `${MYANIMELIST_API}/manga/${parseInt(mangaId)}/my_list_status`,
+                        url: `${MYANIMELIST_API}/manga/${parseInt(mangaId)}/my_list_status&nsfw=true`,
                         method: 'DELETE'
                     }), 1)
 
@@ -449,7 +449,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
                 }
 
                 const response = await this.requestManager.schedule(App.createRequest({
-                    url: `${MYANIMELIST_API}/manga/${parseInt(mangaId)}/my_list_status`,
+                    url: `${MYANIMELIST_API}/manga/${parseInt(mangaId)}/my_list_status&nsfw=true`,
                     method: 'PUT',
                     headers: {
                         'content-type': 'application/x-www-form-urlencoded'
