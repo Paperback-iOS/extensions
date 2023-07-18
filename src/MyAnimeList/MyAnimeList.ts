@@ -178,7 +178,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
 
     async getMangaProgress(mangaId: string): Promise<MangaProgress | undefined> {
         const response = await this.requestManager.schedule(App.createRequest({
-            url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=my_list_status&nsfw=true`),
+            url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=my_list_status`),
             method: 'GET'
         }), 1)
 
@@ -398,7 +398,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
 
                 if (status == 'NONE' && mangaId != null) {
                     await this.requestManager.schedule(App.createRequest({
-                        url: `${MYANIMELIST_API}/manga/${parseInt(mangaId)}/my_list_status&nsfw=true`,
+                        url: `${MYANIMELIST_API}/manga/${parseInt(mangaId)}/my_list_status`,
                         method: 'DELETE'
                     }), 1)
 
@@ -449,7 +449,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
                 }
 
                 const response = await this.requestManager.schedule(App.createRequest({
-                    url: `${MYANIMELIST_API}/manga/${parseInt(mangaId)}/my_list_status&nsfw=true`,
+                    url: `${MYANIMELIST_API}/manga/${parseInt(mangaId)}/my_list_status`,
                     method: 'PUT',
                     headers: {
                         'content-type': 'application/x-www-form-urlencoded'
