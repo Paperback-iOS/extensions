@@ -35,7 +35,7 @@ export const MyAnimeListInfo: SourceInfo = {
     author: 'Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.0.0',
+    version: '1.0.1',
     description: 'MyAnimeList Tracker',
     websiteBaseURL: 'https://myanimelist.net',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -117,7 +117,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
         const pageURL = metadata as string
 
         const response = await this.requestManager.schedule(App.createRequest({
-            url: pageURL ?? `${MYANIMELIST_API}/manga?q=${encodeURI(query.title ?? '')}`,
+            url: pageURL ?? `${MYANIMELIST_API}/manga?q=${encodeURI(query.title ?? '')}&nsfw=true`,
             method: 'GET'
         }), 1)
 
