@@ -9,7 +9,7 @@ export const getDefaultStatus = async (stateManager: SourceStateManager): Promis
 export const getDefaultPrivate = async (stateManager: SourceStateManager): Promise<string[]> => {
     return (await stateManager.retrieve('defaultPrivate') as string[]) ?? ['NEVER']
 }
-export const getDefaultHideFromActivity = async (stateManager: SourceStateManager): Promise<string[]> => {
+export const getDefaultHideFromStatusLists = async (stateManager: SourceStateManager): Promise<string[]> => {
     return (await stateManager.retrieve('defaultHideFromActivity') as string[]) ?? ['NEVER']
 }
 
@@ -83,11 +83,11 @@ export const trackerSettings = (stateManager: SourceStateManager): DUINavigation
                                 ]
                             }),
                             App.createDUISelect({
-                                id: 'defaultHideFromActivity',
-                                label: 'Hide from Activity by Default',
+                                id: 'defaultHideFromStatusLists',
+                                label: 'Hide from Status List by Default',
                                 allowsMultiselect: false,
                                 value: App.createDUIBinding({
-                                    get: () => getDefaultHideFromActivity(stateManager),
+                                    get: () => getDefaultHideFromStatusLists(stateManager),
                                     set: async (newValue) => await stateManager.store('defaultHideFromActivity', newValue)
                                 }),
                                 labelResolver: async (value) => {

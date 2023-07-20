@@ -33,7 +33,7 @@ import { AnilistResult } from './models/anilist-result'
 import {
     getDefaultStatus,
     getDefaultPrivate,
-    getDefaultHideFromActivity,
+    getDefaultHideFromStatusLists,
     trackerSettings
 } from './AlSettings'
 
@@ -44,7 +44,7 @@ export const AnilistInfo: SourceInfo = {
     author: 'Faizan Durrani ♥ Netsky',
     contentRating: ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.1.5',
+    version: '1.1.7',
     description: 'Anilist Tracker',
     websiteBaseURL: 'https://anilist.co',
     intents: SourceIntents.MANGA_TRACKING | SourceIntents.SETTINGS_UI
@@ -350,10 +350,10 @@ export class Anilist implements Searchable, MangaProgressProviding {
                                 value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : ((await getDefaultPrivate(this.stateManager) == 'ADULTONLY' && anilistManga.isAdult || await getDefaultPrivate(this.stateManager) == 'ALWAYS') ? true : false)
                             }),
                             App.createDUISwitch({
-                                id: 'hideFromActivity',
-                                label: 'Hide From Activity',
+                                id: 'hiddenFromStatusLists',
+                                label: 'Hide From Status List',
                                 //@ts-ignore
-                                value: anilistManga.mediaListEntry?.private != undefined ? anilistManga.mediaListEntry.private : ((await getDefaultHideFromActivity(this.stateManager) == 'ADULTONLY' && anilistManga.isAdult || await getDefaultHideFromActivity(this.stateManager) == 'ALWAYS') ? true : false)
+                                value: anilistManga.mediaListEntry?.hiddenFromStatusLists != undefined ? anilistManga.mediaListEntry.hiddenFromStatusLists : ((await getDefaultHideFromStatusLists(this.stateManager) == 'ADULTONLY' && anilistManga.isAdult || await getDefaultHideFromStatusLists(this.stateManager) == 'ALWAYS') ? true : false)
                             })
                         ]
                     }),
@@ -392,7 +392,7 @@ export class Anilist implements Searchable, MangaProgressProviding {
                         progressVolumes: values['progressVolumes'],
                         repeat: values['repeat'],
                         private: values['private'],
-                        hiddenFromStatusLists: values['hideFromActivity'],
+                        hiddenFromStatusLists: values['hiddenFromStatusLists'],
                         score: Number(values['score'])
                     })
                 }
@@ -511,12 +511,9 @@ export class Anilist implements Searchable, MangaProgressProviding {
                 }
 
                 if (anilistManga?.mediaListEntry) {
-                    // If the Anilist volume is higher than progresss, skip
-                    if (anilistManga.mediaListEntry.progressVolumes && anilistManga.mediaListEntry.progressVolumes > Math.floor(readAction.volumeNumber)) {
-                        continue
-                    }
-                    // If the Anilist volume is the same as progress but Anilist chapter is higher or equal, skip
-                    if (anilistManga.mediaListEntry.progress && anilistManga.mediaListEntry.progressVolumes == Math.floor(readAction.volumeNumber) && anilistManga.mediaListEntry.progress >= Math.floor(readAction.chapterNumber)) {
+                    // If the Anilist chapter is higher or equal, skip
+                    if (anilistManga.mediaListEntry.progress && anilistManga.mediaListEntry.progress >= Math.floor(readAction.chapterNumber)) {
+                        await actionQueue.discardChapterReadAction(readAction)
                         continue
                     }
                 }
