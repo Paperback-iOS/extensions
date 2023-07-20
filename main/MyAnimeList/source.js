@@ -2748,7 +2748,7 @@ exports.MyAnimeListInfo = {
     author: 'Netsky',
     contentRating: types_1.ContentRating.EVERYONE,
     icon: 'icon.png',
-    version: '1.0.0',
+    version: '1.0.1',
     description: 'MyAnimeList Tracker',
     websiteBaseURL: 'https://myanimelist.net',
     intents: types_1.SourceIntents.MANGA_TRACKING | types_1.SourceIntents.SETTINGS_UI
@@ -2821,7 +2821,7 @@ class MyAnimeList {
         return __awaiter(this, void 0, void 0, function* () {
             const pageURL = metadata;
             const response = yield this.requestManager.schedule(App.createRequest({
-                url: pageURL !== null && pageURL !== void 0 ? pageURL : `${MYANIMELIST_API}/manga?q=${encodeURI((_a = query.title) !== null && _a !== void 0 ? _a : '')}`,
+                url: pageURL !== null && pageURL !== void 0 ? pageURL : `${MYANIMELIST_API}/manga?q=${encodeURI((_a = query.title) !== null && _a !== void 0 ? _a : '')}&nsfw=true`,
                 method: 'GET'
             }), 1);
             const malPage = (0, mal_result_1.MalResult)(response);
