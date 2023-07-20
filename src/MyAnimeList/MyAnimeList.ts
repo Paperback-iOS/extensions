@@ -143,7 +143,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
 
     async getMangaDetails(mangaId: string): Promise<SourceManga> {
         const response = await this.requestManager.schedule(App.createRequest({
-            url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=id,title,main_picture,alternative_titles,synopsis,mean,rank,popularity,nsfw,media_type,status,my_list_status,num_volumes,num_chapters,authors{first_name,last_name}&nsfw=true`),
+            url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=id,title,main_picture,alternative_titles,synopsis,mean,rank,popularity,nsfw,media_type,status,my_list_status,num_volumes,num_chapters,authors{first_name,last_name}`),
             method: 'GET'
         }), 1)
 
@@ -204,7 +204,7 @@ export class MyAnimeList implements Searchable, MangaProgressProviding {
             sections: async () => {
                 const [response] = await Promise.all([
                     this.requestManager.schedule(App.createRequest({
-                        url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=id,title,main_picture,alternative_titles,synopsis,mean,rank,popularity,nsfw,media_type,status,my_list_status,num_volumes,num_chapters,authors{first_name,last_name}&nsfw=true`),
+                        url: encodeURI(`${MYANIMELIST_API}/manga/${parseInt(mangaId)}?fields=id,title,main_picture,alternative_titles,synopsis,mean,rank,popularity,nsfw,media_type,status,my_list_status,num_volumes,num_chapters,authors{first_name,last_name}`),
                         method: 'GET'
                     }), 1),
 
